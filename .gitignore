@@ -423,3 +423,4 @@ $RECYCLE.BIN/
 /.idea/vcs.xml
 /.idea/inspectionProfiles/profiles_settings.xml
 /.idea/ouaf.iml
+/.idea/.gitignore
