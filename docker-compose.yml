@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  postgre-caisse:
+  postgres-ouaf:
     image: postgres:14
 #    restart: always
     environment:
@@ -13,7 +13,7 @@ services:
     networks:
       - django_network
 
-  caisse:
+  ouaf:
     build: .
 #    user: "{UID}:${GID}"
 #    command: python manage.py runserver 0.0.0.0:8000
@@ -23,7 +23,7 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - postgre-caisse
+      - postgres-ouaf
     environment:
       - DJANGO_DB_HOST=${DJANGO_DB_HOST}
       - DJANGO_DB_PORT=${DJANGO_DB_PORT}
@@ -40,5 +40,4 @@ volumes:
 
 networks:
   django_network:
-
 
