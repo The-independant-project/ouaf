@@ -424,3 +424,7 @@ $RECYCLE.BIN/
 /.idea/inspectionProfiles/profiles_settings.xml
 /.idea/ouaf.iml
 /.idea/.gitignore
+
+# start.sh and autorun
+docker-compose-autorun.yml
+start.sh
