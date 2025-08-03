@@ -1,25 +1,27 @@
-# Comment faire pour lancer l'instance
+# Comment faire pour installer / lancer l'instance
 
-## 1. Cloner le répository
+## Installer l'instance
+### Cloner le répository
 
 Exécuter la commande `git clone git@github.com:The-independant-project/ouaf.git`
 
-## 2. Build l'image
+### Build l'image
 
 Dans le répertoire où la solution a été clonée, exécuter la commande `docker build --tag="<nom du tag>" .`
 
-## 3. Créer le fichier .env
+### Créer le fichier .env
 
 Dans le répertoire où la solution a été clonée, copier coller le fichier `.env.exemple` vers un fichier nomme `.env`.
 Eventuellement modifier les valeurs à l'intérieur de ce fichier `.env`.
 Le fichier .env a pour but de conserver les paramètres de locaux (id, mdp, port...) nécessaires au bon fonctionnement de l'instance docker.
 
-## 4. Compose l'image
+## Lancer l'instance
+### Compose l'image
 
 Dans le répertoire où la solution a été clonée, exécuter la commande `docker compose -p <nom de l'image de sortie> -f docker-compose.yml up`
 Dans notre cas, cela va également lancer le container.
 
-## 5. Rentrer dans l'image
+### Rentrer dans l'image
 
 Dans un nouveau terminal, envoyer une commande pour lancer un shell au container : `docker exec -it <nom du container> bash`
 Cela ouvre un shell bash.
