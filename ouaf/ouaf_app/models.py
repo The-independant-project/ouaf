@@ -22,9 +22,9 @@ class Person(AbstractUser):
     address = models.CharField(max_length=1000)
     city = models.CharField(max_length=100)
     country = models.CharField(max_length=100)
-    is_volunteer = models.BooleanField()
-    is_member = models.BooleanField()
-    newsletter_subscription = models.BooleanField()
+    is_volunteer = models.BooleanField(default=False)
+    is_member = models.BooleanField(default=False)
+    newsletter_subscription = models.BooleanField(default=False)
 
 class Event(models.Model):
     summary = models.CharField(max_length=500)
@@ -38,7 +38,7 @@ class Event(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
 
-class MemberPayments(models.Model):
+class MemberPayment(models.Model):
     personId = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=None) # index
     paymentDate = models.DateTimeField() # end date, primary cluster key of the table
     amount = models.FloatField()
