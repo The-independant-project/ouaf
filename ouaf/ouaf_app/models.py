@@ -33,7 +33,7 @@ class Event(models.Model):
     until = models.DateTimeField() # end date, primary cluster key of the table
     duration = models.DurationField()
     organizer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=None) # index
-    attendees = models.ManyToManyField(settings.AUTH_USER_MODEL, on_delete=None)
+    attendees = models.ManyToManyField(settings.AUTH_USER_MODEL)
     address = models.CharField(max_length=1000)
     latitude = models.FloatField()
     longitude = models.FloatField()
