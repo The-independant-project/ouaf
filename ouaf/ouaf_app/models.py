@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 
+
 # Create your models here.
 
 class Person(AbstractUser):
@@ -26,21 +27,23 @@ class Person(AbstractUser):
     is_member = models.BooleanField(default=False)
     newsletter_subscription = models.BooleanField(default=False)
 
+
 class Event(models.Model):
     summary = models.CharField(max_length=500)
-    description = models.CharField()
+    description = models.TextField()
     start = models.DateTimeField()
-    until = models.DateTimeField() # end date, primary cluster key of the table
+    until = models.DateTimeField()  # end date, primary cluster key of the table
     duration = models.DurationField()
-    organizer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=None) # index
+    organizer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=None)  # index
     attendees = models.ManyToManyField(settings.AUTH_USER_MODEL)
     address = models.CharField(max_length=1000)
     latitude = models.FloatField()
     longitude = models.FloatField()
 
+
 class MemberPayment(models.Model):
-    personId = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=None) # index
-    paymentDate = models.DateTimeField() # end date, primary cluster key of the table
+    personId = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=None)  # index
+    paymentDate = models.DateTimeField()  # end date, primary cluster key of the table
     amount = models.FloatField()
 
 
