@@ -1,3 +1,9 @@
 from django.contrib import admin
+from .models import *
 
-# Register your models here.
+@admin.register(Person)
+@admin.register(Event)
+@admin.register(MemberPayment)
+@admin.register(Animal)
+class DefaultAdminTemplate(admin.ModelAdmin):
+    pass
