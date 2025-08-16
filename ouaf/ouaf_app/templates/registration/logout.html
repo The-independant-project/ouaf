@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block subtitle %} - Déconnexion{% endblock %}
+
+Logout page
+
+<form method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit">logout</button>
+</form>

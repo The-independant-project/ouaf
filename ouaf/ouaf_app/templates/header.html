@@ -1,1 +1,9 @@
-<p>testheader</p>
+<a href="{% url 'index' %}">Accueil</a>
+{% if user.is_authenticated %}
+    Hi {{ user.username }}!
+    <a href="{% url 'my_logout' %}">Déconnexion</a>
+{% else %}
+    <p>Vous n'êtes pas connectés</p>
+    <a href="{% url 'signup' %}">S'inscrire</a>
+    <a href="{% url 'login' %}">Connexion</a>
+{% endif %}
