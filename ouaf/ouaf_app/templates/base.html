@@ -1,7 +1,20 @@
-<html>
-<head>
-</head>
-<body>
-<h1>base.html</h1>
-</body>
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta http-equiv="X-UA-Compatible" content="ie=edge">
+      <title>{% block title %}Les sourires d'Hindi{% endblock %}</title>
+  </head>
+  <body>
+    <header>
+        {% include "header.html" %}
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        {% include "footer.html" %}
+    </footer>
+  </body>
 </html>
