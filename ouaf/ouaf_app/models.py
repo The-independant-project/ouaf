@@ -34,15 +34,15 @@ class Event(models.Model):
     start = models.DateTimeField()
     until = models.DateTimeField()  # end date, primary cluster key of the table
     duration = models.DurationField()
-    organizer = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)  # index
-    attendees = models.ManyToManyField(settings.AUTH_USER_MODEL)
+    organizer = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name='organiser2person')  # index
+    attendees = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='attendees2person')
     address = models.CharField(max_length=1000)
     latitude = models.FloatField()
     longitude = models.FloatField()
 
 
 class MemberPayment(models.Model):
-    personId = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=None)  # index
+    personId = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)  # index
     paymentDate = models.DateTimeField()  # end date, primary cluster key of the table
     amount = models.FloatField()
 
