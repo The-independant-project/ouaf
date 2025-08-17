@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block subtitle %} - Gérer mon compte{% endblock %}
+
+{% block content %}
+<form method="post" action="{% url 'account_edit' %}">
+    {% csrf_token %}
+    {% if form.errors %}
+        {{form.errors}}
+    {% endif %}
+    {{ form }}
+    <input type="submit" value="Confirmer">
+    <input type="hidden" name="next" value="{{ next }}">
+</form>
+
+{% endblock %}
