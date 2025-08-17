@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block subtitle %} - Trombinoscope{% endblock %}
+
+{% block content %}
+<h1>Trombinoscope</h1>
+
+
+{% for member in organisation_members %}
+    {{member.personId.last_name}}
+    {{member.personId.first_name}}
+    <img src="{{ member.photo.url }}" alt="img"/>
+    {{member.text}}
+{% endfor %}
+
+{% endblock %}

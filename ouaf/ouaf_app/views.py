@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout, authenticate, login
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, login_not_required
 from django.http import HttpRequest
-from .forms import PersonForm
+from .forms import PersonForm, RegistrationForm
+from .models import OrganisationChartEntry
 
 
 
@@ -18,7 +19,7 @@ def my_logout(request):
 
 def signup_user(request:HttpRequest):
     if request.method == "POST":
-        form = PersonForm(request.POST)
+        form = RegistrationForm(request.POST)
         if form.is_valid():
             form.save()
             new_user = authenticate(username=form.cleaned_data['username'],
@@ -28,7 +29,7 @@ def signup_user(request:HttpRequest):
         else:
             print(form.errors)
     else:
-        form = PersonForm()
+        form = RegistrationForm()
     template_name = "registration/signup.html"
     context = { "form":form }
     return render(request, template_name, context)
@@ -46,3 +47,8 @@ def account_edit(request):
     template_name = "account/account_edit.html"
     context = { "form":form }
     return render(request, template_name, context)
+
+
+def organisation_chart(request):
+    context = { "organisation_members": OrganisationChartEntry.objects.all() }
+    return render(request, "organisationChart.html", context)
