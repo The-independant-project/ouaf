@@ -5,5 +5,6 @@ from .models import *
 @admin.register(Event)
 @admin.register(MemberPayment)
 @admin.register(Animal)
+@admin.register(OrganisationChartEntry)
 class DefaultAdminTemplate(admin.ModelAdmin):
     pass
