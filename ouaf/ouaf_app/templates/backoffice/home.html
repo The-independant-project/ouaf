@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Backoffice</h1>
+  <ul>
+    {% for s in sections %}
+      <li><a href="{{ s.url }}">{{ s.label }}</a></li>
+    {% endfor %}
+  </ul>
+{% endblock %}
