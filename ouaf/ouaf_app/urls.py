@@ -2,6 +2,8 @@ from django.urls import path, include
 from . import views
 
 urlpatterns = [
+    path("backoffice/", include("ouaf_app.urls_backoffice")),
+
     path("", views.index, name='index'),
     path('account/logout', views.my_logout, name="my_logout"),
     path("account/", include("django.contrib.auth.urls")),

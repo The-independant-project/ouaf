@@ -1,0 +1,82 @@
+from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.urls import reverse_lazy
+from django.views.generic import TemplateView, ListView, DeleteView, UpdateView, CreateView
+from .mixins import BackofficeAccessRequiredMixin
+from .models import Event, Animal
+
+User = get_user_model()
+
+
+class BackofficeHome(BackofficeAccessRequiredMixin, TemplateView):
+    template_name = "backoffice/home.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["sections"] = [
+            {"label": "Utilisateurs", "url": reverse_lazy("backoffice:user_list")},
+            {"label": "Événements", "url": reverse_lazy("backoffice:event_list")},
+            {"label": "Animaux", "url": reverse_lazy("backoffice:animal_list")},
+            ##
+        ]
+
+        return context
+
+
+class UserListView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, ListView):
+    model = User
+    template_name = "backoffice/users/list.html"
+    permission_required = "ouaf_app.view_person"
+    raise_exception = True
+
+
+class UserUpdateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, UpdateView):
+    model = User
+    fields = ["first_name", "last_name", "email", "is_member", "is_volunteer", "newsletter_subscription", "country",
+              "city", "address"]
+    template_name = 'backoffice/users/form.html'
+    permission_required = "ouaf_app.change_person"
+    success_url = reverse_lazy("backoffice:user_list")
+    raise_exception = True
+
+
+class EventListView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, ListView):
+    model = Event
+    template_name = "backoffice/events/list.html"
+    permission_required = "ouaf_app.view_event"
+    raise_exception = True
+
+
+class EventCreateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, CreateView):
+    model = Event
+    fields = ["summary", "description", "start", "until", "duration",
+              "organizer", "attendees", "address", "latitude", "longitude", "is_published"]
+    template_name = "backoffice/events/form.html"
+    permission_required = "ouaf_app.add_event"
+    success_url = reverse_lazy("backoffice:event_list")
+    raise_exception = True
+
+
+class EventUpdateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, UpdateView):
+    model = Event
+    fields = ["summary", "description", "start", "until", "duration",
+              "organizer", "attendees", "address", "latitude", "longitude", "is_published"]
+    template_name = "backoffice/events/form.html"
+    permission_required = "ouaf_app.change_event"
+    success_url = reverse_lazy("backoffice:event_list")
+    raise_exception = True
+
+
+class EventDeleteView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, DeleteView):
+    model = Event
+    template_name = "backoffice/events/confirm_delete.html"
+    permission_required = "ouaf_app.delete_event"
+    success_url = reverse_lazy('backoffice:event_list')
+    raise_exception = True
+
+
+class AnimalListView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, ListView):
+    model = Animal
+    template_name = "backoffice/animals/list.html"
+    permission_required = "ouaf_app.view_animal"
+    raise_exception = True

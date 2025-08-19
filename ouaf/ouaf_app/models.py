@@ -27,6 +27,11 @@ class Person(AbstractUser):
     is_member = models.BooleanField(default=False)
     newsletter_subscription = models.BooleanField(default=False)
 
+    class Meta:
+        permissions = [
+            ("can_change_user_role", "Can change user roles")
+        ]
+
 
 class Event(models.Model):
     summary = models.CharField(max_length=500)
@@ -34,12 +39,19 @@ class Event(models.Model):
     start = models.DateTimeField()
     until = models.DateTimeField()  # end date, primary cluster key of the table
     duration = models.DurationField()
-    organizer = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name='organiser2person')  # index
+    organizer = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL,
+                                  related_name='organiser2person')  # index
     attendees = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='attendees2person')
     address = models.CharField(max_length=1000)
     latitude = models.FloatField()
     longitude = models.FloatField()
+    is_published = models.BooleanField(default=False)
 
+
+    class Meta:
+        permissions = [
+            ("can_publish_event","Can publish an event"),
+        ]
 
 class MemberPayment(models.Model):
     personId = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)  # index
@@ -53,8 +65,8 @@ class Animal(models.Model):
     death = models.DateTimeField()
     pet_amount = models.IntegerField()
 
+
 class OrganisationChartEntry(models.Model):
     personId = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)  # index
     text = models.CharField(max_length=1000)
     photo = models.ImageField(upload_to='images/organisationChart', blank=True)
-
