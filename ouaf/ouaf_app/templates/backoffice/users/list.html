@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% for person in person_list %}
+    <span> <p>{{ person.username }} : {{  person.first_name }} {{ person.last_name }}</p>  </span>
+
+
+{% endfor %}
+
+{% endblock %}
