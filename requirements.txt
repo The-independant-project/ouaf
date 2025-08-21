@@ -4,3 +4,4 @@ python-decouple
 python-dotenv
 pillow
 gunicorn
+whitenoise
