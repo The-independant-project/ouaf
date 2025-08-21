@@ -9,7 +9,7 @@ User = get_user_model()
 
 
 def _perm(app_label, model, codename):
-    app_model = ContentType.objects.get(app_label=app_label, model=model.lower())
+    app_model = ContentType.objects.get(app_label=app_label.lower(), model=model.lower())
     return Permission.objects.get(content_type=app_model, codename=codename)
 
 
