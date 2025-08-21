@@ -2,6 +2,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.forms.widgets import PasswordInput
 from .models import Person
 from django import forms
+from .groups import *
 
 
 class RegistrationForm(UserCreationForm):
@@ -52,11 +53,11 @@ class PersonForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         instance = kwargs.get('instance', None)
         if instance:
-            kwargs['initial'] = { 'is_volunteer': instance.is_volunteer, 'is_member': instance.is_member, 'is_backoffice': instance.is_backoffice }
+            kwargs['initial'] = { 'is_volunteer': instance.belongs_to_group(GROUP_VOLUNTEER), 'is_member': instance.belongs_to_group(GROUP_MEMBER), 'is_backoffice': instance.belongs_to_group(GROUP_BACKOFFICE) }
         super().__init__(*args, **kwargs)
 
     def save(self, *args, **kwargs):
-        self.instance.is_volunteer = self.cleaned_data['is_volunteer']
-        self.instance.is_member = self.cleaned_data['is_member']
-        self.instance.is_backoffice = self.cleaned_data['is_backoffice']
+        self.instance.set_group(GROUP_VOLUNTEER, self.cleaned_data['is_volunteer'])
+        self.instance.set_group(GROUP_MEMBER,  self.cleaned_data['is_member'])
+        self.instance.set_group(GROUP_BACKOFFICE,  self.cleaned_data['is_backoffice'])
         return super().save(*args, **kwargs)

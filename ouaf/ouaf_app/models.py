@@ -25,29 +25,11 @@ class Person(AbstractUser):
     city = models.CharField(max_length=100)
     country = models.CharField(max_length=100)
     newsletter_subscription = models.BooleanField(default=False)
-
-    @property
-    def is_volunteer(self) -> bool:
-        return self.groups.filter(name=GROUP_VOLUNTEER).exists()
-    @is_volunteer.setter
-    def is_volunteer(self, value:bool):
-        self.set_group(GROUP_VOLUNTEER, value)
-    @property
-    def is_member(self) -> bool:
-        return self.groups.filter(name=GROUP_MEMBER).exists()
-    @is_member.setter
-    def is_member(self, value:bool):
-        self.set_group(GROUP_MEMBER, value)
-    @property
-    def is_backoffice(self) -> bool:
-        return self.groups.filter(name=GROUP_BACKOFFICE).exists()
-    @is_backoffice.setter
-    def is_backoffice(self, value:bool):
-        self.set_group(GROUP_BACKOFFICE, value)
+    def belongs_to_group(self, group_name):
+        return self.groups.filter(name=group_name).exists()
     def set_group(self, group_name, value):
-        group, _ = Group.objects.get_or_create(name=group_name)
+        group = Group.objects.get(name=group_name)
         self.groups.add(group) if value else self.groups.remove(group)
-
     class Meta:
         permissions = [
             ("can_change_user_role", "Can change user roles")
