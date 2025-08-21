@@ -1,1 +1,66 @@
-<p>test</p>
+{% load static %}
+
+<div class="footer__inner">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <a href="/" class="footer__logo" aria-label="Aller à l'accueil">
+        <img src="{% static 'images/Logo_ISA_svg.svg' %}" alt="Logo Les Sourires d'Hindi" class="header__logo">
+        </a>
+        <p class="footer__brandTagline">Redonner le sourire, une patte après l'autre</p>
+
+        <ul class="footer__social" aria-label="Réseaux sociaux">
+          <li><a class="footer__socialLink" href="#" aria-label="Instagram">Instagram</a></li>
+          <li><a class="footer__socialLink" href="#" aria-label="Facebook">Facebook</a></li>
+          <li><a class="footer__socialLink" href="#" aria-label="LinkedIn">LinkedIn</a></li>
+        </ul>
+      </div>
+
+      <nav class="footer__nav" aria-label="Liens utiles">
+        <div class="footer__col">
+          <h3 class="footer__colTitle">L’association</h3>
+          <ul class="footer__list">
+            <li><a class="footer__link" href="#">Notre mission</a></li>
+            <li><a class="footer__link" href="#">Équipe</a></li>
+            <li><a class="footer__link" href="#">Transparence</a></li>
+          </ul>
+        </div>
+
+        <div class="footer__col">
+          <h3 class="footer__colTitle">Participer</h3>
+          <ul class="footer__list">
+            <li><a class="footer__link" href="#">Devenir bénévole</a></li>
+            <li><a class="footer__link" href="#">Adhérer</a></li>
+            <li><a class="footer__link" href="#">Faire un don</a></li>
+          </ul>
+        </div>
+
+        <div class="footer__col">
+          <h3 class="footer__colTitle">Événements</h3>
+          <ul class="footer__list">
+            <li><a class="footer__link" href="#">À venir</a></li>
+            <li><a class="footer__link" href="#">Passés</a></li>
+            <li><a class="footer__link" href="#">Organiser</a></li>
+          </ul>
+        </div>
+
+        <div class="footer__col">
+          <h3 class="footer__colTitle">Contact</h3>
+          <ul class="footer__list">
+            <li><a class="footer__link" href="#">Nous écrire</a></li>
+            <li><a class="footer__link" href="#">FAQ</a></li>
+            <li><a class="footer__link" href="#">Presse</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+
+    <div class="footer__bottom">
+      <p class="footer__copy">© {{ now|date:"Y" }} Les Sourires d’Hindi</p>
+      <ul class="footer__legal">
+        <li><a class="footer__legalLink" href="#">Mentions légales</a></li>
+        <li><a class="footer__legalLink" href="#">CGU</a></li>
+        <li><a class="footer__legalLink" href="#">Confidentialité</a></li>
+        <li><a class="footer__legalLink" href="#">Cookies</a></li>
+      </ul>
+    </div>
+  </div>
