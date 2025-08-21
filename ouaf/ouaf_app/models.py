@@ -1,6 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Group
 from django.conf import settings
+from .groups import *
 
 
 # Create your models here.
@@ -23,9 +24,29 @@ class Person(AbstractUser):
     address = models.CharField(max_length=1000)
     city = models.CharField(max_length=100)
     country = models.CharField(max_length=100)
-    is_volunteer = models.BooleanField(default=False)
-    is_member = models.BooleanField(default=False)
     newsletter_subscription = models.BooleanField(default=False)
+
+    @property
+    def is_volunteer(self) -> bool:
+        return self.groups.filter(name=GROUP_VOLUNTEER).exists()
+    @is_volunteer.setter
+    def is_volunteer(self, value:bool):
+        self.set_group(GROUP_VOLUNTEER, value)
+    @property
+    def is_member(self) -> bool:
+        return self.groups.filter(name=GROUP_MEMBER).exists()
+    @is_member.setter
+    def is_member(self, value:bool):
+        self.set_group(GROUP_MEMBER, value)
+    @property
+    def is_backoffice(self) -> bool:
+        return self.groups.filter(name=GROUP_BACKOFFICE).exists()
+    @is_backoffice.setter
+    def is_backoffice(self, value:bool):
+        self.set_group(GROUP_BACKOFFICE, value)
+    def set_group(self, group_name, value):
+        group, _ = Group.objects.get_or_create(name=group_name)
+        self.groups.add(group) if value else self.groups.remove(group)
 
     class Meta:
         permissions = [
