@@ -9,8 +9,8 @@
         <p class="footer__brandTagline">Redonner le sourire, une patte après l'autre</p>
 
         <ul class="footer__social" aria-label="Réseaux sociaux">
-          <li><a class="footer__socialLink" href="#" aria-label="Instagram">Instagram</a></li>
-          <li><a class="footer__socialLink" href="#" aria-label="Facebook">Facebook</a></li>
+          <li><a class="footer__socialLink" target="_blank" href="https://www.instagram.com/lessouriresdhindi/" aria-label="Instagram">Instagram</a></li>
+          <li><a class="footer__socialLink" target="_blank" href="https://www.facebook.com/profile.php?id=61576603605132" aria-label="Facebook">Facebook</a></li>
           <li><a class="footer__socialLink" href="#" aria-label="LinkedIn">LinkedIn</a></li>
         </ul>
       </div>
@@ -20,7 +20,7 @@
           <h3 class="footer__colTitle">L’association</h3>
           <ul class="footer__list">
             <li><a class="footer__link" href="#">Notre mission</a></li>
-            <li><a class="footer__link" href="#">Équipe</a></li>
+            <li><a class="footer__link" href="{% url 'organisation_chart' %}">Équipe</a></li>
           </ul>
         </div>
 
@@ -56,8 +56,9 @@
       <ul class="footer__legal">
         <li><a class="footer__legalLink" href="#">Mentions légales</a></li>
         <li><a class="footer__legalLink" href="#">CGU</a></li>
-        <li><a class="footer__legalLink" href="#">Confidentialité</a></li>
+        <li><a class="footer__legalLink" href="{% url 'confidentialite' %}">Confidentialité</a></li>
         <li><a class="footer__legalLink" href="#">Cookies</a></li>
       </ul>
     </div>
   </div>
+

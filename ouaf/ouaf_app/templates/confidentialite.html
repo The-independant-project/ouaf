@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block subtitle %} – Politique de confidentialité{% endblock %}
+
+{% block content %}
+
+<style>
+  body {
+    background-image: url("{% static 'images/logo_vectorise.svg' %}");
+    background-repeat: no-repeat;
+    background-position: top 20% center;
+    background-size: 50%;
+  }
+  .policy { display:block; padding:6rem 1rem 3rem; }
+  .policy__container {
+    max-width:800px; margin:0 auto; background:rgba(255,255,255,.85);
+    backdrop-filter:blur(2px); border:1px solid var(--clr-primary-dark, #f3a9a0);
+    border-radius:12px; padding:2rem 1.25rem;
+  }
+  .policy__title { margin:0 0 .25rem; font-size:clamp(1.6rem,3.5vw,2rem); line-height:1.2; color:var(--clr-ink,#2b2b2b); text-align:center; }
+  .policy__meta { margin:0 0 1.75rem; text-align:center; color:var(--clr-muted,#6b6b6b); font-size:.95rem; }
+  .policy__section + .policy__section { margin-top:1.5rem; padding-top:1.25rem; border-top:1px dashed var(--clr-primary-dark,#f3a9a0); }
+  .policy__section h2 { margin:0 0 .5rem; font-size:1.1rem; line-height:1.35; color:var(--clr-ink,#2b2b2b); }
+  .policy__section p { margin:0 0 .5rem; line-height:1.6; color:var(--clr-ink,#2b2b2b); }
+  .policy__list { margin:.25rem 0 .75rem 1.25rem; padding:0; }
+  .policy__list li { margin:.25rem 0; line-height:1.55; }
+  .policy__signature { margin-top:2rem; padding-top:1.25rem; border-top:1px solid var(--clr-primary,#f9cac2); }
+  .policy__sig { margin:.25rem 0 0; }
+  @media (min-width:640px){ .policy{padding:7rem 1.25rem 4rem;} .policy__container{padding:2.25rem 2rem;} }
+</style>
+
+<article class="policy" role="article">
+  <div class="policy__container">
+    <h1 class="policy__title">Politique de Confidentialité – Association Les Sourires d’Hindi</h1>
+    <p class="policy__meta">Dernière mise à jour : 06 février 2025</p>
+
+    <section class="policy__section" id="intro">
+      <p>
+        L’Association Les Sourires d’Hindi s’engage à protéger la confidentialité des informations personnelles et sensibles des adhérents, bénévoles, partenaires, bénéficiaires et visiteurs de son site.
+        Cette politique explique nos engagements, nos pratiques et vos droits concernant le traitement des données, conformément au Règlement Général sur la Protection des Données (RGPD).
+      </p>
+    </section>
+
+    <!-- 1. Charte de confidentialité -->
+    <section class="policy__section" id="part-1">
+      <h2>1. Charte de confidentialité</h2>
+
+      <h2>Article 1 – Objet</h2>
+      <p>Cette charte vise à garantir la confidentialité des informations échangées, recueillies et traitées dans le cadre des activités de l’association. Elle s’applique à tous les membres, bénévoles, intervenants et partenaires.</p>
+
+      <h2>Article 2 – Principes généraux</h2>
+      <ul class="policy__list">
+        <li>Toutes les informations personnelles et professionnelles obtenues dans le cadre des interventions sont strictement confidentielles.</li>
+        <li>Seules les personnes autorisées peuvent accéder aux informations sensibles.</li>
+        <li>Aucune information ne peut être divulguée sans consentement préalable, sauf obligation légale.</li>
+      </ul>
+
+      <h2>Article 3 – Données sensibles</h2>
+      <ul class="policy__list">
+        <li>Les données relatives à l’état de santé des bénéficiaires doivent être traitées avec la plus grande discrétion et uniquement par des professionnels habilités.</li>
+        <li>Toute information sur la vie privée des bénéficiaires est protégée et ne peut être utilisée qu’à des fins strictement nécessaires.</li>
+      </ul>
+
+      <h2>Article 4 – Engagement des membres et intervenants</h2>
+      <ul class="policy__list">
+        <li>Chaque membre ou intervenant s’engage à respecter cette charte sous peine de sanctions pouvant aller jusqu’à l’exclusion.</li>
+        <li>Les échanges entre intervenants et bénéficiaires doivent rester strictement confidentiels.</li>
+      </ul>
+
+      <h2>Article 5 – Conservation et destruction des données</h2>
+      <ul class="policy__list">
+        <li>Les documents contenant des informations confidentielles doivent être conservés en lieu sûr.</li>
+        <li>Les données devenues inutiles doivent être détruites de manière sécurisée.</li>
+      </ul>
+
+      <h2>Article 6 – Respect des engagements contractuels</h2>
+      <ul class="policy__list">
+        <li>Les partenaires et prestataires doivent respecter ces principes.</li>
+        <li>Des accords de confidentialité peuvent être signés au besoin.</li>
+      </ul>
+
+      <h2>Article 7 – Sanctions</h2>
+      <p>Toute violation de cette charte peut entraîner :</p>
+      <ul class="policy__list">
+        <li>Un rappel à l’ordre ;</li>
+        <li>L’exclusion des interventions ;</li>
+        <li>L’exclusion de l’association ;</li>
+        <li>Des poursuites disciplinaires ou judiciaires.</li>
+      </ul>
+    </section>
+
+    <!-- 2. Registre des activités de traitement -->
+    <section class="policy__section" id="registre">
+      <h2>2. Registre des activités de traitement</h2>
+      <p>L’association tient un registre complet des activités de traitement. Ce registre décrit notamment :</p>
+      <ul class="policy__list">
+        <li>Les types d’activités concernées (médiation animale, gestion des adhésions, gestion des bénévoles, vente en ligne, etc.) ;</li>
+        <li>Les catégories de données collectées ;</li>
+        <li>Les destinataires autorisés ;</li>
+        <li>Les mesures de sécurité mises en place.</li>
+      </ul>
+      <p>Ce registre peut être communiqué sur simple demande en contactant l’association.</p>
+    </section>
+
+    <!-- 3. Gestion des données – Adhérents -->
+    <section class="policy__section" id="adherents">
+      <h2>3. Gestion des données – Adhérents</h2>
+
+      <h3>Finalités du traitement</h3>
+      <ul class="policy__list">
+        <li>Gérer les adhésions (administration, paiements, comptabilité) ;</li>
+        <li>Permettre l’accès à des contenus réservés ;</li>
+        <li>Envoyer des newsletters et informations exclusives ;</li>
+        <li>Suivre les activités de l’association.</li>
+      </ul>
+
+      <h3>Données collectées</h3>
+      <ul class="policy__list">
+        <li>Identité : nom, prénom, date de naissance, adresse postale et email ;</li>
+        <li>Informations financières : montant et mode de paiement ;</li>
+        <li>Données techniques : adresse IP, identifiants de connexion, cookies techniques ;</li>
+        <li>Photos ou vidéos si l’adhérent y consent.</li>
+      </ul>
+
+      <h3>Durée de conservation</h3>
+      <p>1 an après la fin de l’adhésion.</p>
+
+      <h3>Mesures de sécurité</h3>
+      <ul class="policy__list">
+        <li>Site sécurisé HTTPS (SSL/TLS) ;</li>
+        <li>Chiffrement des paiements en ligne ;</li>
+        <li>Sauvegardes automatiques régulières des données ;</li>
+        <li>Antivirus et mises à jour régulières.</li>
+      </ul>
+    </section>
+
+    <!-- 4. Gestion des données – Bénévoles -->
+    <section class="policy__section" id="benevoles">
+      <h2>4. Gestion des données – Bénévoles</h2>
+
+      <h3>Finalités du traitement</h3>
+      <ul class="policy__list">
+        <li>Gérer les candidatures et le suivi des bénévoles ;</li>
+        <li>Répartir les missions selon les compétences et disponibilités ;</li>
+        <li>Communiquer sur les projets et activités ;</li>
+        <li>Gérer les accès aux outils internes ;</li>
+        <li>Collecter des photos/vidéos pour la promotion des événements.</li>
+      </ul>
+
+      <h3>Données collectées</h3>
+      <ul class="policy__list">
+        <li>Identité : nom, prénom, date de naissance, adresse postale, email, téléphone ;</li>
+        <li>Disponibilités et compétences professionnelles ;</li>
+        <li>Données techniques : adresse IP, identifiants de connexion, journaux de connexion ;</li>
+        <li>Photos ou vidéos si le bénévole y consent.</li>
+      </ul>
+
+      <h3>Durée de conservation</h3>
+      <p>Pendant toute la durée du bénévolat, puis 3 ans après la fin de la relation.</p>
+
+      <h3>Mesures de sécurité</h3>
+      <ul class="policy__list">
+        <li>Contrôle d’accès strict aux données ;</li>
+        <li>Journalisation des accès ;</li>
+        <li>Sauvegardes régulières et chiffrement des données ;</li>
+        <li>Outils conformes au RGPD pour le stockage tiers (ex. Google Drive).</li>
+      </ul>
+    </section>
+
+    <!-- 5. Vos droits -->
+    <section class="policy__section" id="droits">
+      <h2>5. Vos droits</h2>
+      <p>Conformément au RGPD, vous disposez des droits suivants :</p>
+      <ul class="policy__list">
+        <li><strong>Accès</strong> : obtenir une copie de vos données ;</li>
+        <li><strong>Rectification</strong> : corriger des données inexactes ;</li>
+        <li><strong>Suppression</strong> : demander l’effacement de vos données ;</li>
+        <li><strong>Opposition</strong> : vous opposer à certains traitements ;</li>
+        <li><strong>Portabilité</strong> : récupérer vos données dans un format lisible.</li>
+      </ul>
+      <p>Pour exercer vos droits :</p>
+      <ul class="policy__list">
+        <li>📧 Email : <a href="mailto:isabelle.courtes@hotmail.fr">isabelle.courtes@hotmail.fr</a></li>
+        <li>📞 Téléphone : <a href="tel:+33766500037">07&nbsp;66&nbsp;50&nbsp;00&nbsp;37</a></li>
+      </ul>
+      <p>Une réponse sera fournie sous 30 jours conformément à la réglementation.</p>
+    </section>
+
+    <!-- 6. Responsable de la protection des données -->
+    <section class="policy__section" id="dpo">
+      <h2>6. Responsable de la protection des données</h2>
+      <p><strong>Déléguée à la protection des données (DPO)</strong> :</p>
+      <p>
+        Mme Isabelle COURTES<br>
+        670 chemin de Marlençon<br>
+        26800 MONTOISON<br>
+        📧 <a href="mailto:isabelle.courtes@hotmail.fr">isabelle.courtes@hotmail.fr</a><br>
+        📞 <a href="tel:+33766500037">07&nbsp;66&nbsp;50&nbsp;00&nbsp;37</a>
+      </p>
+    </section>
+
+
+    <section class="policy__section" id="maj">
+      <h2>7. Mise à jour de la politique</h2>
+      <p>
+        Cette politique peut être mise à jour à tout moment pour refléter les évolutions légales, techniques ou organisationnelles.
+        La date de dernière mise à jour figure en haut de cette page.
+      </p>
+    </section>
+
+    <section class="policy__signature">
+      <p class="policy__sig"><strong>Association Les Sourires d’Hindi</strong></p>
+    </section>
+  </div>
+</article>
+
+{% endblock %}
