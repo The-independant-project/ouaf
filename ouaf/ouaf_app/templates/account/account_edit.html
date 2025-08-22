@@ -1,16 +1,68 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block subtitle %} - Gérer mon compte{% endblock %}
+{% block subtitle %} – Gérer mon compte{% endblock %}
 
 {% block content %}
-<form method="post" action="{% url 'account_edit' %}">
-    {% csrf_token %}
-    {% if form.errors %}
-        {{form.errors}}
-    {% endif %}
-    {{ form }}
-    <input type="submit" value="Confirmer">
-    <input type="hidden" name="next" value="{{ next }}">
-</form>
+
+
+<section class="account">
+  <div class="account__card">
+    <header class="account__head">
+      <h1 class="account__title">Gérer mon compte</h1>
+      <p class="account__meta">Mettez à jour vos informations personnelles et vos préférences.</p>
+    </header>
+
+    <div class="account__body">
+      <form method="post" action="{% url 'account_edit' %}">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="form__nonfield">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+
+        <div class="formGrid">
+          {% for field in form %}
+            {% with full=0 %}
+              {% if field.name == 'address' or field.name == 'city' or field.name == 'country' or field.name == 'email' or field.name == 'username' %}
+                {% with full=1 %}{% endwith %}
+              {% endif %}
+            {% endwith %}
+
+            <div class="form__row {% if field.errors %}is-error{% endif %} {% if full %}span-full{% endif %}">
+              <label class="form__label" for="{{ field.id_for_label }}">
+                {{ field.label }}
+                {% if field.field.required %}<span class="form__required" aria-hidden="true">*</span>{% endif %}
+              </label>
+
+              {{ field }}
+
+              {% if field.help_text %}
+                <div class="form__help">{{ field.help_text|safe }}</div>
+              {% endif %}
+
+              {% if field.errors %}
+                <div class="form__errors">{{ field.errors }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+
+        <input type="hidden" name="next" value="{{ next }}">
+
+        <div class="account__foot">
+          <button type="submit" class="btn btn--primary">Confirmer</button>
+          <a href="{{ next|default:'/' }}" class="btn btn--ghost">Annuler</a>
+{#          {% url 'password_change' as pw_url %}#}
+{#          {% if pw_url %}#}
+{#            <a href="{{ pw_url }}" class="btn btn--ghost">Modifier mon mot de passe</a>#}
+{#          {% endif %}#}
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
 
 {% endblock %}
