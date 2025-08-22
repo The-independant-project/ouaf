@@ -504,3 +504,151 @@ body.no-scroll {
     box-shadow: 0 4px 18px rgba(0, 0, 0, .05);
   }
 }
+
+
+
+
+
+
+
+/*************EDIT USER********/
+
+
+  .account {
+    padding: clamp(2rem, 4vw, 4rem) var(--space-4);
+  }
+  .account__card {
+    max-width: 840px;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid var(--clr-primary-dark);
+    border-radius: var(--radius);
+    box-shadow: 0 10px 24px rgba(0,0,0,.05);
+    overflow: hidden;
+  }
+  .account__head {
+    padding: 1.25rem 1.25rem 0;
+  }
+  .account__title {
+    margin: 0;
+    font-size: clamp(1.25rem, 2.6vw, 1.6rem);
+    color: var(--clr-ink);
+  }
+  .account__meta {
+    margin: .25rem 0 0;
+    color: var(--clr-muted);
+    font-size: .95rem;
+  }
+
+  /* Forme */
+  .account__body {
+    padding: 1.25rem;
+  }
+  .formGrid {
+    display: grid;
+    gap: var(--space-4);
+  }
+  @media (min-width: 720px){
+    .formGrid { grid-template-columns: 1fr 1fr; }
+    .span-full { grid-column: 1 / -1; }
+  }
+
+  .form__row {
+    display: grid;
+    gap: .4rem;
+  }
+  .form__label {
+    font-weight: 600;
+    color: var(--clr-ink);
+  }
+  .form__required {
+    color: #c62828;
+    margin-left: .25rem;
+  }
+
+  .account__card input[type="text"],
+  .account__card input[type="email"],
+  .account__card input[type="tel"],
+  .account__card input[type="url"],
+  .account__card input[type="number"],
+  .account__card input[type="password"],
+  .account__card textarea,
+  .account__card select {
+    width: 100%;
+    padding: .6rem .7rem;
+    border: 1px solid var(--clr-primary-dark);
+    border-radius: calc(var(--radius) - 4px);
+    background: #fff;
+    color: var(--clr-ink);
+    font: inherit;
+  }
+  .account__card textarea { min-height: 110px; resize: vertical; }
+  .account__card input:focus,
+  .account__card textarea:focus,
+  .account__card select:focus {
+    outline: none;
+    border-color: var(--clr-accent);
+    box-shadow: 0 0 0 3px rgba(47,111,118,.15);
+  }
+
+  .form__help {
+    color: var(--clr-muted);
+    font-size: .9rem;
+  }
+  .form__errors {
+    color: #b00020;
+    font-size: .9rem;
+  }
+  .form__row.is-error input,
+  .form__row.is-error textarea,
+  .form__row.is-error select {
+    border-color: #b00020;
+  }
+
+  /* Actions */
+  .account__foot {
+    padding: 1rem 1.25rem 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    border-top: 1px dashed var(--clr-primary-dark);
+    background: var(--clr-bg);
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    padding: .65rem 1rem;
+    border-radius: calc(var(--radius) - 3px);
+    border: 1px solid transparent;
+    text-decoration: none;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .btn--primary {
+    background: var(--clr-primary);
+    border-color: var(--clr-primary-dark);
+    color: var(--clr-ink);
+  }
+  .btn--primary:hover { filter: brightness(.98); }
+  .btn--ghost {
+    background: #fff;
+    border-color: var(--clr-primary-dark);
+    color: var(--clr-accent);
+  }
+  .btn--danger {
+    background: #fff;
+    border-color: #d32f2f;
+    color: #d32f2f;
+  }
+
+  /* Bandeau d’erreurs globales */
+  .form__nonfield {
+    margin: 0 0 1rem;
+    padding: .75rem 1rem;
+    border-radius: calc(var(--radius) - 4px);
+    border: 1px solid #b00020;
+    background: #fff5f6;
+    color: #b00020;
+  }
