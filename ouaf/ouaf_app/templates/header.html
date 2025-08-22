@@ -38,14 +38,18 @@
           <div class="header__userLinks">
             <a class="header__userLink" href="{% url 'account_edit' %}">Mon compte</a>
             <a class="header__userLink" href="{% url 'my_logout' %}">Déconnexion</a>
+              {% if perms.ouaf_app.view_event %}
             <a class="header__userLink" href="{% url 'backoffice:home' %}">Backoffice</a>
+              {% endif %}
           </div>
 
           <!-- Mobile -->
           <ul class="header__userList">
             <li><a class="header__userLink" href="{% url 'account_edit' %}">Mon compte</a></li>
             <li><a class="header__userLink" href="{% url 'my_logout' %}">Déconnexion</a></li>
+              {% if perms.ouaf_app.view_event %}
             <li><a class="header__userLink" href="{% url 'backoffice:home' %}">Backoffice</a></li>
+              {% endif %}
           </ul>
 
         {% else %}
