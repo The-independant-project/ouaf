@@ -3,7 +3,9 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, ListView, DeleteView, UpdateView, CreateView
 from .mixins import BackofficeAccessRequiredMixin
-from .models import Event, Animal
+from ouaf_app.models import Event, Animal
+from ouaf_app.groups import *
+from .forms import PersonEditForm
 
 User = get_user_model()
 
@@ -19,7 +21,6 @@ class BackofficeHome(BackofficeAccessRequiredMixin, TemplateView):
             {"label": "Animaux", "url": reverse_lazy("backoffice:animal_list")},
             ##
         ]
-
         return context
 
 
@@ -32,8 +33,7 @@ class UserListView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, ListV
 
 class UserUpdateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = User
-    fields = ["first_name", "last_name", "email", "is_member", "is_volunteer", "newsletter_subscription", "country",
-              "city", "address"]
+    form_class = PersonEditForm
     template_name = 'backoffice/users/form.html'
     permission_required = "ouaf_app.change_person"
     success_url = reverse_lazy("backoffice:user_list")

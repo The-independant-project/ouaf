@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Edition de {{person.first_name}} {{person.last_name}}</h1>
+    <form method="post" action="{% url 'backoffice:user_edit' person.id %}">
+        {% csrf_token %}
+        {% if form.errors %}
+            {{form.errors}}
+        {% endif %}
+        {{ form }}
+        <input type="submit" value="Confirmer">
+        <input type="hidden" name="next" value="{{ next }}">
+    </form>
+{% endblock %}
