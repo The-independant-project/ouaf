@@ -24,6 +24,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include('ouaf_app.urls')),
+    path("backoffice/", include('ouaf_backoffice_app.urls')),
     path("index/", RedirectView.as_view(url="/", permanent=True)),
 ]
 
