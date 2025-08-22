@@ -9,9 +9,8 @@ from .models import Person, Event, MemberPayment, Animal, OrganisationChartEntry
 @admin.register(Person)
 class PersonAdmin(DjangoUserAdmin):
     list_display = ("username", "email", "first_name", "last_name",
-                    "is_active", "is_staff", "is_superuser",
-                    "is_member", "is_volunteer")
-    list_filter = ("is_active", "is_staff", "is_superuser", "is_member", "is_volunteer")
+                    "is_active", "is_staff", "is_superuser")
+    list_filter = ("is_active", "is_staff", "is_superuser")
     search_fields = ("username", "email", "first_name", "last_name")
     ordering = ("username",)
 
@@ -23,7 +22,6 @@ class PersonAdmin(DjangoUserAdmin):
             "fields": ("first_name", "last_name", "email", "address", "city", "country",
                        "newsletter_subscription"),
         }),
-        ("Rôles métier", {"fields": ("is_member", "is_volunteer")}),
         ("Permissions", {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
         ("Dates importantes", {"fields": ("last_login", "date_joined")}),
     )
@@ -35,7 +33,6 @@ class PersonAdmin(DjangoUserAdmin):
                        "first_name", "last_name", "email",
                        "address", "city", "country",
                        "newsletter_subscription",
-                       "is_member", "is_volunteer",
                        "is_active", "is_staff", "is_superuser"),
         }),
     )
