@@ -63,7 +63,7 @@ footer{
 
 /* Brand */
 .footer__brand{
-  min-width: 260px;
+  min-width: 0;
   max-width: 420px;
   display: flex;
   flex-direction: column;
@@ -75,6 +75,9 @@ footer{
   align-items: center;
   gap: var(--space-3);
   text-decoration: none;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
 }
 
 .footer__logoIcon{
