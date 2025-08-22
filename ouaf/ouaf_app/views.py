@@ -52,3 +52,8 @@ def account_edit(request):
 def organisation_chart(request):
     context = { "organisation_members": OrganisationChartEntry.objects.all() }
     return render(request, "organisationChart.html", context)
+
+
+
+def confidentialite(request):
+    return render(request, "confidentialite.html")
