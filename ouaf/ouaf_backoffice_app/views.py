@@ -3,8 +3,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, ListView, DeleteView, UpdateView, CreateView
 from .mixins import BackofficeAccessRequiredMixin
-from ouaf_app.models import Event, Animal
-from ouaf_app.groups import *
+from ouaf_app.models import Event, Animal, Service
 from .forms import PersonEditForm
 
 User = get_user_model()
@@ -19,6 +18,7 @@ class BackofficeHome(BackofficeAccessRequiredMixin, TemplateView):
             {"label": "Utilisateurs", "url": reverse_lazy("backoffice:user_list")},
             {"label": "Événements", "url": reverse_lazy("backoffice:event_list")},
             {"label": "Animaux", "url": reverse_lazy("backoffice:animal_list")},
+            {"label": "Services", "url": reverse_lazy("backoffice:service_list")},
             ##
         ]
         return context
@@ -79,4 +79,19 @@ class AnimalListView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, Lis
     model = Animal
     template_name = "backoffice/animals/list.html"
     permission_required = "ouaf_app.view_animal"
+    raise_exception = True
+
+
+class ServiceListView(ListView):
+    model = Service
+    template_name = "backoffice/services/list.html"
+    permission_required = "ouaf_app.view_person"
+    raise_exception = True
+
+class ServiceUpdateView(UpdateView):
+    model = Service
+    fields = ["title", "description", "price", "photo"]
+    template_name = "backoffice/services/update.html"
+    permission_required = "ouaf_app.change_service"
+    success_url = reverse_lazy("backoffice:service_list")
     raise_exception = True

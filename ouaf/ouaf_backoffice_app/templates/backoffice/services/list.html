@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% for service in service_list %}
+    <span> <a href="{% url 'backoffice:service_update' service.id %}">{{ service.title }}</a> </span>
+{% endfor %}
+
+{% endblock %}

@@ -31,6 +31,9 @@
         <li class="header__item">
           <a class="header__link {% if request.resolver_match.url_name == 'mediation_animale' %}is-active{% endif %}" href="{% url 'mediation_animale' %}">Médiation animale</a>
         </li>
+        <li class="header__item">
+          <a class="header__link {% if request.resolver_match.url_name == 'services_list' %}is-active{% endif %}" href="{% url 'services_list' %}">Services</a>
+        </li>
       </ul>
 
       <div class="header__user">
