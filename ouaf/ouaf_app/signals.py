@@ -33,6 +33,11 @@ def ensure_roles_and_permission(sender, **kwargs):
     animal_change = _perm("ouaf_app", "animal", "change_animal")
     animal_delete = _perm("ouaf_app", "animal", "delete_animal")
 
+    service_view = _perm("ouaf_app", "service", "view_service")
+    service_add = _perm("ouaf_app", "service", "add_service")
+    service_change = _perm("ouaf_app", "service", "change_service")
+    service_delete = _perm("ouaf_app", "service", "delete_service")
+
     # memberpayment_view = _perm("ouaf_app", "memberpayment", "view_memberpayment")
     # memberpayment_add = _perm("ouaf_app", "memberpayment", "add_memberpayment")
     # memberpayment_change = _perm("ouaf_app", "memberpayment", "change_memberpayment")

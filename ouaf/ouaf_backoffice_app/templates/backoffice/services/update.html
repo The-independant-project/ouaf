@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Edition de {{person.first_name}} {{person.last_name}}</h1>
-    <form method="post" action="{% url 'backoffice:user_edit' person.id %}" enctype="multipart/form-data">
+<h1>Edition du service {{service.title}}</h1>
+    <form method="post" action="{% url 'backoffice:service_update' service.id %}" enctype="multipart/form-data">
         {% csrf_token %}
         {% if form.errors %}
             {{form.errors}}

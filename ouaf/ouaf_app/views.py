@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import login_required, login_not_required
+from django.views.generic import ListView
 from django.http import HttpRequest
 from .forms import PersonForm, RegistrationForm
-from .models import OrganisationChartEntry
+from .models import OrganisationChartEntry,Service
 
 
 
@@ -58,3 +59,11 @@ def mediation_animale(request):
 
 def confidentialite(request):
     return render(request, "confidentialite.html")
+
+
+
+
+class ServiceListView(ListView):
+    model = Service
+    template_name = "services/list.html"
+    raise_exception = True

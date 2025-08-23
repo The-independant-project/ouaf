@@ -69,3 +69,11 @@ class OrganisationChartEntryAdmin(admin.ModelAdmin):
     list_display = ("personId", "text")
     search_fields = ("personId__username", "text")
     autocomplete_fields = ("personId",)
+
+# @admin.register(Service)
+# class ServiceEntryAdmin(admin.ModelAdmin):
+#     list_display = ("personId", "text")
+#     search_fields = ("personId__username", "text")
+#     autocomplete_fields = ("personId",)
+
+admin.site.register(Service)
