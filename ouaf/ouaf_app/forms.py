@@ -2,8 +2,6 @@ from django.contrib.auth.forms import UserCreationForm
 from django.forms.widgets import PasswordInput
 from .models import Person
 from django import forms
-from .groups import *
-
 
 class RegistrationForm(UserCreationForm):
     username = forms.CharField(required=True)

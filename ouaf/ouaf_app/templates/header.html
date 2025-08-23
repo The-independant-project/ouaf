@@ -28,6 +28,9 @@
         <li class="header__item">
           <a class="header__link {% if request.resolver_match.url_name == 'organisation_chart' %}is-active{% endif %}" href="{% url 'organisation_chart' %}">Trombinoscope</a>
         </li>
+        <li class="header__item">
+          <a class="header__link {% if request.resolver_match.url_name == 'mediation_animale' %}is-active{% endif %}" href="{% url 'mediation_animale' %}">Médiation animale</a>
+        </li>
       </ul>
 
       <div class="header__user">
