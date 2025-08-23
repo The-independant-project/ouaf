@@ -13,7 +13,6 @@ def _perm(app_label, model, codename):
     return Permission.objects.get(content_type=app_model, codename=codename)
 
 
-@receiver(post_migrate)
 def ensure_roles_and_permission(sender, **kwargs):
     backoffice, _ = Group.objects.get_or_create(name=GROUP_BACKOFFICE)
     volunteer, _ = Group.objects.get_or_create(name=GROUP_VOLUNTEER)
