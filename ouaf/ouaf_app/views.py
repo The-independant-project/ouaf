@@ -53,7 +53,8 @@ def organisation_chart(request):
     context = { "organisation_members": OrganisationChartEntry.objects.all() }
     return render(request, "organisationChart.html", context)
 
-
+def mediation_animale(request):
+    return render(request, "mediationAnimale.html")
 
 def confidentialite(request):
     return render(request, "confidentialite.html")
