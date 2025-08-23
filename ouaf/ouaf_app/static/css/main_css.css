@@ -14,7 +14,7 @@
   --space-6: 1.5rem;
   --space-8: 2rem;
   --radius: 10px;
-  --max-w: 1200px;
+  --max-w: 66%;
 }
 
 body{
@@ -287,7 +287,6 @@ footer{
   background: var(--clr-bg);
   border-radius: var(--radius);
   padding: 1rem;
-  margin-right: 1rem;
   cursor: pointer;
   line-height: 0;
   z-index: 100;
