@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% for activite in activite_list %}
+    <span> <a href="{% url 'backoffice:activite_update' activite.id %}">{{ activite.title }}</a> </span>
+{% endfor %}
+
+{% endblock %}

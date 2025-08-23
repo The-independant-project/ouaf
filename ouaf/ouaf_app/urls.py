@@ -10,6 +10,7 @@ urlpatterns = [
     path("organisationChart", views.organisation_chart, name="organisation_chart"),
     path("mediationAnimale", views.mediation_animale, name="mediation_animale"),
     path("services/list", views.ServiceListView.as_view(), name="services_list"),
+    path("activites/list", views.ActiviteListView.as_view(), name="activites_list"),
 
     path("confidentialite", views.confidentialite, name="confidentialite")
     #account/login/ [name='login']

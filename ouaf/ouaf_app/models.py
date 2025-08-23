@@ -79,3 +79,8 @@ class Service(models.Model):
     description = models.TextField()
     price = models.FloatField()
     image = models.ImageField(upload_to='images/services', blank=True)
+
+class Activite(models.Model):
+    title = models.CharField(max_length=1000)
+    description = models.TextField()
+    image = models.ImageField(upload_to='images/activites', blank=True)
