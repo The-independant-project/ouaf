@@ -3,7 +3,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, ListView, DeleteView, UpdateView, CreateView
 from .mixins import BackofficeAccessRequiredMixin
-from ouaf_app.models import Event, Animal, Service
+from ouaf_app.models import Event, Animal, Service, Activite
 from .forms import PersonEditForm
 
 User = get_user_model()
@@ -19,6 +19,7 @@ class BackofficeHome(BackofficeAccessRequiredMixin, TemplateView):
             {"label": "Événements", "url": reverse_lazy("backoffice:event_list")},
             {"label": "Animaux", "url": reverse_lazy("backoffice:animal_list")},
             {"label": "Services", "url": reverse_lazy("backoffice:service_list")},
+            {"label": "Activites", "url": reverse_lazy("backoffice:activite_list")},
             ##
         ]
         return context
@@ -90,8 +91,22 @@ class ServiceListView(ListView):
 
 class ServiceUpdateView(UpdateView):
     model = Service
-    fields = ["title", "description", "price", "photo"]
+    fields = ["title", "description", "price", "image"]
     template_name = "backoffice/services/update.html"
-    permission_required = "ouaf_app.change_service"
+    permission_required = "ouaf_app.change_services"
     success_url = reverse_lazy("backoffice:service_list")
+    raise_exception = True
+
+class ActiviteListView(ListView):
+    model = Activite
+    template_name = "backoffice/activites/list.html"
+    permission_required = "ouaf_app.view_activite"
+    raise_exception = True
+
+class ActiviteUpdateView(UpdateView):
+    model = Activite
+    fields = ["title", "description", "image"]
+    template_name = "backoffice/activites/update.html"
+    permission_required = "ouaf_app.change_activite"
+    success_url = reverse_lazy("backoffice:activite_list")
     raise_exception = True

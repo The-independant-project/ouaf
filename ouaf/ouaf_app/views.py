@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required, login_not_required
 from django.views.generic import ListView
 from django.http import HttpRequest
 from .forms import PersonForm, RegistrationForm
-from .models import OrganisationChartEntry,Service
+from .models import OrganisationChartEntry, Service, Activite
 
 
 
@@ -49,7 +49,6 @@ def account_edit(request):
     context = { "form":form }
     return render(request, template_name, context)
 
-
 def organisation_chart(request):
     context = { "organisation_members": OrganisationChartEntry.objects.all() }
     return render(request, "organisationChart.html", context)
@@ -62,8 +61,12 @@ def confidentialite(request):
 
 
 
-
 class ServiceListView(ListView):
     model = Service
     template_name = "services/list.html"
+    raise_exception = True
+
+class ActiviteListView(ListView):
+    model = Activite
+    template_name = "activites/list.html"
     raise_exception = True

@@ -5,6 +5,6 @@
 {% block content %}
 <h1>Services</h1>
     {% for service in service_list %}
-    <li>{{ service.title }} {{ service.description }} {{ service.price }} <img src="{{ service.photo.url }}"/></li>
+    <li>{{ service.title }} {{ service.description }} {{ service.price }} <img src="{{ service.image.url }}"/></li>
     {% endfor %}
 {% endblock %}
