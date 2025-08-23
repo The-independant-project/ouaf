@@ -69,6 +69,8 @@ def ensure_roles_and_permission(sender, **kwargs):
         person_view, person_change,
         animal_view, animal_add, animal_change, animal_delete,
         # memberpayment_view, memberpayment_add, memberpayment_change, memberpayment_delete,
+
+        service_view, service_add, service_change, service_delete,
     }
 
     volunteer.permissions.set({p for p in volunteer_perms if p})
