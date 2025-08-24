@@ -64,11 +64,12 @@ class AnimalAdmin(admin.ModelAdmin):
     date_hierarchy = "birth"
 
 
-@admin.register(OrganisationChartEntry)
-class OrganisationChartEntryAdmin(admin.ModelAdmin):
-    list_display = ("personId", "text")
-    search_fields = ("personId__username", "text")
-    autocomplete_fields = ("personId",)
+# @admin.register(OrganisationChartEntry)
+# class OrganisationChartEntryAdmin(admin.ModelAdmin):
+#     list_display = ("personId", "text")
+#     search_fields = ("personId__username", "text")
+#     autocomplete_fields = ("personId",)
 
+admin.site.register(OrganisationChartEntry)
 admin.site.register(Service)
 admin.site.register(Activite)

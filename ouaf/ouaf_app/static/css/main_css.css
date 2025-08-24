@@ -651,3 +651,160 @@ body.no-scroll {
     background: #fff5f6;
     color: #b00020;
   }
+
+
+/* ============================= */
+/* TEAM (trombinoscope) – v3     */
+/* ============================= */
+.team {
+  max-width: var(--max-w);
+  margin-inline: auto;
+  padding: var(--space-8) var(--space-4);
+}
+
+/* Header */
+.team__header {
+  text-align: center;
+  margin-bottom: var(--space-8);
+}
+.team__header h1 {
+  font-size: clamp(1.8rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: var(--clr-ink);
+  margin: 0;
+}
+
+/* Grille : 3 par ligne */
+.team__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-8);
+  margin-inline: auto;
+}
+
+/* Tablette : 2 par ligne */
+@media (max-width: 1024px) {
+  .team__list {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+  }
+}
+
+/* Mobile : 1 par ligne */
+@media (max-width: 640px) {
+  .team__list {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+}
+
+/* Carte */
+.team__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  /* <= 3 par ligne */
+  max-width: none;
+  flex: 0 0 calc((100% - (2 * var(--space-8))) / 3);
+
+}
+
+/* Tablette : 2 par ligne */
+@media (max-width: 1024px) {
+  .team__list { gap: var(--space-6); }
+  .team__card { flex-basis: calc((100% - var(--space-6)) / 2); }
+}
+
+/* Mobile : 1 par ligne */
+@media (max-width: 640px) {
+  .team__card { flex-basis: 100%; }
+}
+
+/* Figure */
+.team__figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  position: relative;
+}
+
+/* Avatar plus grand */
+.team__photoWrap {
+  position: relative;
+  width: clamp(220px, 20vw, 300px);
+  aspect-ratio: 1 / 1;
+  margin-inline: auto;
+}
+
+@media (max-width: 1024px) { /* Tablette */
+  .team__photoWrap { max-width: 220px; }
+}
+
+@media (max-width: 640px) { /* Mobile */
+  .team__photoWrap { max-width: 200px; }
+}
+
+/* Image ronde */
+.team__photo {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid var(--clr-primary);
+  background-color: var(--clr-bg);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  position: relative;
+  z-index: 1;
+}
+/* Chien visible et superposé */
+.team__badgeDog {
+  position: absolute;
+  width: 28%;           /* Taille cohérente avec la photo */
+  aspect-ratio: 1 / 1;
+  bottom: -8%;
+  right: -8%;
+  z-index: 3;
+  pointer-events: none;
+  transform: rotate(-5deg);
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.12));
+}
+
+/* Caption */
+.team__caption {
+  margin-top: var(--space-3);
+  max-width: 90%;
+}
+
+.team__name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--clr-ink);
+  margin: 0;
+}
+
+.team__bio {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--clr-muted);
+  margin-top: var(--space-2);
+  text-align: center;
+  max-width: 40ch;
+  margin-inline: auto;
+}
+
+/* État vide */
+.team__empty {
+  text-align: center;
+  color: var(--clr-muted);
+  font-style: italic;
+}
