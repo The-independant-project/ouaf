@@ -772,10 +772,10 @@ body.no-scroll {
   position: absolute;
   width: 28%;           /* Taille cohérente avec la photo */
   aspect-ratio: 1 / 1;
+  cursor: pointer;
   bottom: -8%;
   right: -8%;
   z-index: 3;
-  pointer-events: none;
   transform: rotate(-5deg);
   filter: drop-shadow(0 2px 6px rgba(0,0,0,.12));
 }
