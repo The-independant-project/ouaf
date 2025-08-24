@@ -2,9 +2,11 @@
 
 {% block content %}
 
+<h1>Liste des services</h1>
+<ul>
 {% for activite in activite_list %}
-    <span> <a href="{% url 'backoffice:activite_update' activite.id %}">{{ activite.title }}</a> </span>
+    <li><span><a href="{% url 'backoffice:activite_update' activite.id %}">{{ activite.title }}</a></span></li>
 {% endfor %}
-
+</ul>
 <a href="{% url 'backoffice:activite_create'%}">Créer une nouvelle activité</a>
 {% endblock %}

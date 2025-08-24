@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Edition de l'activite {{activite.title}}</h1>
-    <form method="post" action="{% url 'backoffice:activite_update' activite.id %}" enctype="multipart/form-data">
+<h1>Suppression de l'activité {{activite.title}}</h1>
+    <form method="post" action="{% url 'backoffice:activite_delete' activite.id %}" enctype="multipart/form-data">
         {% csrf_token %}
         {% if form.errors %}
             {{form.errors}}
@@ -11,6 +11,4 @@
         <input type="submit" value="Confirmer">
         <input type="hidden" name="next" value="{{ next }}">
     </form>
-
-<a href="{% url 'backoffice:activite_delete' activite.id%}">Supprimer l'activité</a>
 {% endblock %}

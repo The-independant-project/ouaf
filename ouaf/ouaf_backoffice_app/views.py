@@ -105,6 +105,13 @@ class ServiceUpdateView(UpdateView):
     success_url = reverse_lazy("backoffice:service_list")
     raise_exception = True
 
+class ServiceDeleteView(DeleteView):
+    model = Service
+    template_name = "backoffice/services/confirm_delete.html"
+    permission_required = "ouaf_app.delete_service"
+    success_url = reverse_lazy('backoffice:service_list')
+    raise_exception = True
+
 class ActiviteListView(ListView):
     model = Activite
     template_name = "backoffice/activites/list.html"
@@ -125,4 +132,10 @@ class ActiviteUpdateView(UpdateView):
     template_name = "backoffice/activites/update.html"
     permission_required = "ouaf_app.change_activite"
     success_url = reverse_lazy("backoffice:activite_list")
+    raise_exception = True
+class ActiviteDeleteView(DeleteView):
+    model = Activite
+    template_name = "backoffice/activites/confirm_delete.html"
+    permission_required = "ouaf_app.delete_activite"
+    success_url = reverse_lazy('backoffice:activite_list')
     raise_exception = True
