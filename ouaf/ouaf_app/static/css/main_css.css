@@ -573,7 +573,6 @@ body.no-scroll {
   .account__card input[type="password"],
   .account__card textarea,
   .account__card select {
-    width: 100%;
     padding: .6rem .7rem;
     border: 1px solid var(--clr-primary-dark);
     border-radius: calc(var(--radius) - 4px);
@@ -607,6 +606,7 @@ body.no-scroll {
   /* Actions */
   .account__foot {
     padding: 1rem 1.25rem 1.25rem;
+    margin-top: 1rem;
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-3);
