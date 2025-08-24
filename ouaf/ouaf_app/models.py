@@ -70,8 +70,10 @@ class Animal(models.Model):
 
 
 class OrganisationChartEntry(models.Model):
-    personId = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)  # index
-    text = models.CharField(max_length=1000)
+    first_name = models.CharField(max_length=1000)
+    last_name = models.CharField(max_length=1000)
+    role = models.CharField(max_length=26)
+    description = models.TextField(max_length=1000)
     photo = models.ImageField(upload_to='images/organisationChart', blank=True)
 
 class Service(models.Model):

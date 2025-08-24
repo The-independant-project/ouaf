@@ -7,18 +7,18 @@ from .forms import PersonForm, RegistrationForm
 from .models import OrganisationChartEntry, Service, Activite
 
 
-
 # Create your views here.
 
 def index(request):
     return render(request, "index.html")
+
 
 def my_logout(request):
     logout(request)
     return redirect("/")
 
 
-def signup_user(request:HttpRequest):
+def signup_user(request: HttpRequest):
     if request.method == "POST":
         form = RegistrationForm(request.POST)
         if form.is_valid():
@@ -32,8 +32,9 @@ def signup_user(request:HttpRequest):
     else:
         form = RegistrationForm()
     template_name = "registration/signup.html"
-    context = { "form":form }
+    context = {"form": form}
     return render(request, template_name, context)
+
 
 @login_required
 def account_edit(request):
@@ -46,25 +47,28 @@ def account_edit(request):
     else:
         form = PersonForm(instance=request.user)
     template_name = "account/account_edit.html"
-    context = { "form":form }
+    context = {"form": form}
     return render(request, template_name, context)
 
+
 def organisation_chart(request):
-    context = { "organisation_members": OrganisationChartEntry.objects.all() }
+    context = {"organisation_members": OrganisationChartEntry.objects.all()}
     return render(request, "organisationChart.html", context)
+
 
 def mediation_animale(request):
     return render(request, "mediationAnimale.html")
 
+
 def confidentialite(request):
     return render(request, "confidentialite.html")
-
 
 
 class ServiceListView(ListView):
     model = Service
     template_name = "services/list.html"
     raise_exception = True
+
 
 class ActiviteListView(ListView):
     model = Activite

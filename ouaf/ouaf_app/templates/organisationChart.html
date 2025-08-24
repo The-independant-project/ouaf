@@ -1,16 +1,65 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block subtitle %} - Trombinoscope{% endblock %}
+{% block subtitle %} – Trombinoscope{% endblock %}
 
 {% block content %}
-<h1>Trombinoscope</h1>
+<section class="team" aria-labelledby="team-title">
+  <header class="team__header">
+    <h1 id="team-title">L'équipe</h1>
+  </header>
 
+  <ul class="team__list" role="list">
+    {% for member in organisation_members %}
+      <li class="team__card">
+        <article class="team__person" aria-labelledby="team-name-{{ forloop.counter }}">
+          <figure class="team__figure">
+            <div class="team__photoWrap">
+              {% if member.photo %}
+                <img
+                  class="team__photo"
+                  src="{{ member.photo.url }}"
+                  alt="Portrait de {{ member.first_name }} {{ member.last_name }}"
+                  loading="lazy"
+                  decoding="async"
+                />
+              {% else %}
+                <img
+                  class="team__photo"
+                  src="{% static 'images/avatar_placeholder.svg' %}"
+                  alt="Portrait de {{ member.first_name }} {{ member.last_name }}"
+                  loading="lazy"
+                  decoding="async"
+                />
+              {% endif %}
 
-{% for member in organisation_members %}
-    {{member.personId.last_name}}
-    {{member.personId.first_name}}
-    <img src="{{ member.photo.url }}" alt="img"/>
-    {{member.text}}
-{% endfor %}
+              <img
+                class="team__badgeDog"
+                src="{% static 'images/chien.svg' %}"
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
 
+            <figcaption class="team__caption">
+              <h3 class="team__name" id="team-name-{{ forloop.counter }}">
+                <strong>{{ member.first_name }} {{ member.last_name }} - {{ member.role }}</strong>
+              </h3>
+
+              {% if member.description %}
+                <p class="team__bio">
+                  {{ member.description }}
+                </p>
+              {% endif %}
+            </figcaption>
+          </figure>
+        </article>
+      </li>
+    {% empty %}
+      <li class="team__empty">Aucun membre pour le moment.</li>
+    {% endfor %}
+  </ul>
+</section>
 {% endblock %}
