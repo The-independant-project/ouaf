@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Création d'une nouvelle activité</h1>
+    <form method="post" action="{% url 'backoffice:activite_create' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if form.errors %}
+            {{form.errors}}
+        {% endif %}
+        {{ form }}
+        <input type="submit" value="Confirmer">
+        <input type="hidden" name="next" value="{{ next }}">
+    </form>
+{% endblock %}

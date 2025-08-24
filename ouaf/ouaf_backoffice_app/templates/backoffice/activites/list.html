@@ -6,4 +6,5 @@
     <span> <a href="{% url 'backoffice:activite_update' activite.id %}">{{ activite.title }}</a> </span>
 {% endfor %}
 
+<a href="{% url 'backoffice:activite_create'%}">Créer une nouvelle activité</a>
 {% endblock %}

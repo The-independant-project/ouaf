@@ -6,4 +6,6 @@
     <span> <a href="{% url 'backoffice:service_update' service.id %}">{{ service.title }}</a> </span>
 {% endfor %}
 
+<a href="{% url 'backoffice:service_create'%}">Créer un nouveau service</a>
+
 {% endblock %}
