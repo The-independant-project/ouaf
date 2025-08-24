@@ -86,7 +86,15 @@ class AnimalListView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, Lis
 class ServiceListView(ListView):
     model = Service
     template_name = "backoffice/services/list.html"
-    permission_required = "ouaf_app.view_person"
+    permission_required = "ouaf_app.view_service"
+    raise_exception = True
+
+class ServiceCreateView(CreateView):
+    model = Service
+    fields = ["title", "description", "price", "image"]
+    template_name = "backoffice/services/form.html"
+    permission_required = "ouaf_app.add_service"
+    success_url = reverse_lazy("backoffice:service_list")
     raise_exception = True
 
 class ServiceUpdateView(UpdateView):
@@ -97,10 +105,25 @@ class ServiceUpdateView(UpdateView):
     success_url = reverse_lazy("backoffice:service_list")
     raise_exception = True
 
+class ServiceDeleteView(DeleteView):
+    model = Service
+    template_name = "backoffice/services/confirm_delete.html"
+    permission_required = "ouaf_app.delete_service"
+    success_url = reverse_lazy('backoffice:service_list')
+    raise_exception = True
+
 class ActiviteListView(ListView):
     model = Activite
     template_name = "backoffice/activites/list.html"
     permission_required = "ouaf_app.view_activite"
+    raise_exception = True
+
+class ActiviteCreateView(CreateView):
+    model = Activite
+    fields = ["title", "description", "image"]
+    template_name = "backoffice/activites/form.html"
+    permission_required = "ouaf_app.add_activite"
+    success_url = reverse_lazy("backoffice:activite_list")
     raise_exception = True
 
 class ActiviteUpdateView(UpdateView):
@@ -109,4 +132,10 @@ class ActiviteUpdateView(UpdateView):
     template_name = "backoffice/activites/update.html"
     permission_required = "ouaf_app.change_activite"
     success_url = reverse_lazy("backoffice:activite_list")
+    raise_exception = True
+class ActiviteDeleteView(DeleteView):
+    model = Activite
+    template_name = "backoffice/activites/confirm_delete.html"
+    permission_required = "ouaf_app.delete_activite"
+    success_url = reverse_lazy('backoffice:activite_list')
     raise_exception = True
