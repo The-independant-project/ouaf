@@ -34,6 +34,7 @@ main{
 
 footer{
   background: #ffffff;
+  border-top: solid 1px #f9cac282;
 }
 
 .footer{
