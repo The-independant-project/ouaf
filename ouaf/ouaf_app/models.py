@@ -62,12 +62,32 @@ class MemberPayment(models.Model):
     amount = models.FloatField()
 
 
+class Order(models.Model):
+    foreignId = models.UUIDField(null=False, blank=False)
+    order = models.IntegerField(null=False, blank=False)
 class Animal(models.Model):
-    name = models.CharField(max_length=100)
-    birth = models.DateTimeField()
-    death = models.DateTimeField()
+    name = models.CharField(max_length=100, null=True)
+    description = models.CharField(max_length=1000, null=True)
+    birth = models.DateTimeField(null=True, blank=True)
+    death = models.DateTimeField(null=True, blank=True)
     pet_amount = models.IntegerField()
-
+    def __str__(self):
+        return self.name
+class AnimalImage(models.Model):
+    title = models.CharField(max_length=1000)
+    description = models.CharField(max_length=1000, null=True, blank=True)
+    animal_id = models.ForeignKey(Animal, null=False, blank=False, on_delete=models.CASCADE, related_name="image2animal")
+    image = models.ImageField(upload_to='images/animalImages', null=False, blank=False)
+    is_main_image = models.BooleanField(blank=False)
+    def __str__(self):
+        return f"{self.animal_id.name} - {self.title}"
+class AnimalVideo(models.Model):
+    title = models.CharField(max_length=1000)
+    description = models.CharField(max_length=1000, null=True, blank=True)
+    animal_id = models.ForeignKey(Animal, null=False, blank=False, on_delete=models.CASCADE, related_name="video2animal")
+    video = models.FileField(upload_to='videos/animalVideos', null=False, blank=False)
+    def __str__(self):
+        return f"{self.animal_id.name} - {self.title}"
 
 class OrganisationChartEntry(models.Model):
     first_name = models.CharField(max_length=1000)
@@ -86,3 +106,5 @@ class Activite(models.Model):
     title = models.CharField(max_length=1000)
     description = models.TextField()
     image = models.ImageField(upload_to='images/activites', blank=True)
+
+

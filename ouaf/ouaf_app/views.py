@@ -4,7 +4,8 @@ from django.contrib.auth.decorators import login_required, login_not_required
 from django.views.generic import ListView
 from django.http import HttpRequest
 from .forms import PersonForm, RegistrationForm
-from .models import OrganisationChartEntry, Service, Activite
+from .models import OrganisationChartEntry, Service, Activite, Animal, AnimalImage, AnimalVideo
+from django.db.models import Prefetch
 
 
 # Create your views here.
@@ -64,6 +65,20 @@ def confidentialite(request):
     return render(request, "confidentialite.html")
 
 
+def animal_list(request):
+    animals = Animal.objects.prefetch_related(Prefetch("image2animal", queryset=AnimalImage.objects.filter(is_main_image=True), to_attr="images")).all()
+    context = {"animals": animals}
+    return render(request, "animals/list.html", context)
+
+def animal_detail(request, animal_id):
+    animal = Animal.objects.filter(id=animal_id).first()
+    images = AnimalImage.objects.filter(animal_id=animal_id)
+    videos = AnimalVideo.objects.filter(animal_id=animal_id)
+    context = {"animal": animal, "images": images, "videos": videos}
+    return render(request, "animals/detail.html", context)
+
+
+
 class ServiceListView(ListView):
     model = Service
     template_name = "services/list.html"
@@ -74,3 +89,4 @@ class ActiviteListView(ListView):
     model = Activite
     template_name = "activites/list.html"
     raise_exception = True
+

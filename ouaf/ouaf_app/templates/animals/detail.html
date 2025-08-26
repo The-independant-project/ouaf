@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block subtitle %} - {{animal.name}}{% endblock %}
+
+{% block content %}
+<h1>{{animal.name}}</h1>
+
+    <p>{{ animal.name }} {{ animal.description }}</p>
+    {% for image in images %}
+        <img src="{{ image.image.url }}"/>
+    {% endfor %}
+
+{% endblock %}
