@@ -12,7 +12,7 @@ class PermissionDefiner:
     __codename = ""
     __model = None
 
-    def __init__(self, app_name:str, model_name:str, codename:str):
+    def __init__(self, app_name: str, model_name: str, codename: str):
         self.__app_name = app_name.lower()
         self.__model_name = model_name.lower()
         self.__codename = codename.lower()
@@ -25,6 +25,7 @@ class PermissionDefiner:
 
     def perm_name(self) -> str:
         return f"{self.__app_name}.{self.__codename}"
+
 
 def ensure_roles_and_permission(sender, **kwargs):
     backoffice, _ = Group.objects.get_or_create(name=GROUP_BACKOFFICE)
@@ -45,6 +46,8 @@ def ensure_roles_and_permission(sender, **kwargs):
         # memberpayment_view, memberpayment_add, memberpayment_change, memberpayment_delete,
 
         service_view, service_add, service_change, service_delete,
+
+        organisationChartEntry_view, organisationChartEntry_change, organisationChartEntry_add, organisationChartEntry_delete,
     }
 
     volunteer.permissions.set({p._perm_object() for p in volunteer_perms if p})
@@ -77,6 +80,11 @@ activite_change = PermissionDefiner("ouaf_app", "activite", "change_activite")
 activite_delete = PermissionDefiner("ouaf_app", "activite", "delete_activite")
 
 can_change_user_role = PermissionDefiner("ouaf_app", "person", "can_change_user_role")
+
+organisationChartEntry_view = PermissionDefiner("ouaf_app", "organisationChartEntry", "view_organisationChartEntry")
+organisationChartEntry_add = PermissionDefiner("ouaf_app", "organisationChartEntry", "add_organisationChartEntry")
+organisationChartEntry_change = PermissionDefiner("ouaf_app", "organisationChartEntry", "change_organisationChartEntry")
+organisationChartEntry_delete = PermissionDefiner("ouaf_app", "organisationChartEntry", "delete_organisationChartEntry")
 
 # memberpayment_view = _perm("ouaf_app", "memberpayment", "view_memberpayment")
 # memberpayment_add = _perm("ouaf_app", "memberpayment", "add_memberpayment")

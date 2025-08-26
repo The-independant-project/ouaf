@@ -25,4 +25,9 @@ urlpatterns = [
     path("events/<int:pk>/delete/", views.EventDeleteView.as_view(), name="event_delete"),
 
     path("animals/", views.AnimalListView.as_view(), name="animal_list"),
+
+    path("team/", views.TeamMemberListView.as_view(), name="team_list"),
+    path("team/new", views.TeamMemberCreateView.as_view(), name="team_create"),
+    path("team/<int:pk>/edit/", views.TeamMemberUpdateView.as_view(), name="team_update"),
+    path("team/<int:pk>/delete/", views.TeamMemberDeleteView.as_view(), name="team_delete")
 ]

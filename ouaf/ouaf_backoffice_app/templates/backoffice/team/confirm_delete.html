@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Supprimer un membre – Backoffice{% endblock %}
+
+{% block content %}
+<section class="teamDelete" aria-labelledby="teamDelete-title">
+  <header class="teamCreate__header">
+    <h1 id="teamDelete-title">Supprimer un membre</h1>
+    <a class="btn btn--ghost" href="{% url 'backoffice:team_list' %}">← Retour à la liste</a>
+  </header>
+
+  <article class="account__card" role="alert">
+    <div class="account__body">
+      <header class="account__head">
+        <h2 class="account__title">Confirmer la suppression</h2>
+        <p class="account__meta">
+          Cette action est <strong>irréversible</strong>. Le membre suivant sera supprimé :
+        </p>
+      </header>
+
+      <div class="teamList__card" style="display:flex;align-items:center;gap:1rem;margin-top:.75rem;">
+        <div class="teamList__thumb" style="width:64px;height:64px;overflow:hidden;border-radius:8px;border:1px solid var(--clr-primary-dark);background:#fff;">
+          {% if object.photo %}
+            <img src="{{ object.photo.url }}" alt="Photo de {{ object.first_name }} {{ object.last_name }}" style="width:100%;height:100%;object-fit:cover;">
+          {% else %}
+            <img src="{% static 'images/avatar_placeholder.svg' %}" alt="Photo indisponible" style="width:100%;height:100%;object-fit:cover;">
+          {% endif %}
+        </div>
+
+        <div class="teamList__meta">
+          <h3 class="teamList__name" style="margin:.1rem 0 0;font-size:1.05rem;">
+            {{ object.first_name }} {{ object.last_name }}
+          </h3>
+          {% if object.role %}
+            <p class="teamList__role" style="margin:.15rem 0 0;color:var(--clr-muted);">{{ object.role }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <p style="margin-top:1rem;">
+        Voulez-vous vraiment supprimer ce membre de l’équipe ?
+      </p>
+    </div>
+
+    <form method="post" class="account__foot">
+      {% csrf_token %}
+      <button type="submit" class="btn btn--danger">🗑 Supprimer définitivement</button>
+      <a href="{% url 'backoffice:team_list' %}" class="btn btn--ghost">Annuler</a>
+    </form>
+  </article>
+</section>
+{% endblock %}

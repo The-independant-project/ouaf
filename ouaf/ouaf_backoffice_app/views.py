@@ -3,9 +3,10 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, ListView, DeleteView, UpdateView, CreateView
 from .mixins import BackofficeAccessRequiredMixin
-from ouaf_app.models import Event, Animal, Service, Activite
+from ouaf_app.models import Event, Animal, Service, Activite, OrganisationChartEntry
 from .forms import PersonEditForm
 from ouaf_app.signals import *
+
 
 User = get_user_model()
 
@@ -21,6 +22,7 @@ class BackofficeHome(BackofficeAccessRequiredMixin, TemplateView):
             {"label": "Animaux", "url": reverse_lazy("backoffice:animal_list")},
             {"label": "Services", "url": reverse_lazy("backoffice:service_list")},
             {"label": "Activites", "url": reverse_lazy("backoffice:activite_list")},
+            {"label": "Team Members", "url": reverse_lazy("backoffice:team_list")}
             ##
         ]
         return context
@@ -90,6 +92,7 @@ class ServiceListView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, Li
     permission_required = service_view.perm_name()
     raise_exception = True
 
+
 class ServiceCreateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, CreateView):
     model = Service
     fields = ["title", "description", "price", "image"]
@@ -97,6 +100,7 @@ class ServiceCreateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, 
     permission_required = service_add.perm_name()
     success_url = reverse_lazy("backoffice:service_list")
     raise_exception = True
+
 
 class ServiceUpdateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Service
@@ -106,6 +110,7 @@ class ServiceUpdateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, 
     success_url = reverse_lazy("backoffice:service_list")
     raise_exception = True
 
+
 class ServiceDeleteView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Service
     template_name = "backoffice/services/confirm_delete.html"
@@ -113,11 +118,13 @@ class ServiceDeleteView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, 
     success_url = reverse_lazy('backoffice:service_list')
     raise_exception = True
 
+
 class ActiviteListView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, ListView):
     model = Activite
     template_name = "backoffice/activites/list.html"
     permission_required = activite_view.perm_name()
     raise_exception = True
+
 
 class ActiviteCreateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, CreateView):
     model = Activite
@@ -127,6 +134,7 @@ class ActiviteCreateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin,
     success_url = reverse_lazy("backoffice:activite_list")
     raise_exception = True
 
+
 class ActiviteUpdateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Activite
     fields = ["title", "description", "image"]
@@ -135,9 +143,43 @@ class ActiviteUpdateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin,
     success_url = reverse_lazy("backoffice:activite_list")
     raise_exception = True
 
+
 class ActiviteDeleteView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Activite
     template_name = "backoffice/activites/confirm_delete.html"
     permission_required = activite_delete.perm_name()
     success_url = reverse_lazy('backoffice:activite_list')
+    raise_exception = True
+
+
+class TeamMemberListView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, ListView):
+    model = OrganisationChartEntry
+    template_name = "backoffice/team/list.html"
+    permission_required = organisationChartEntry_view.perm_name()
+    raise_exception = True
+
+
+class TeamMemberCreateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, CreateView):
+    model = OrganisationChartEntry
+    fields = ["first_name", "last_name", "role", "description", "photo"]
+    template_name = "backoffice/team/form.html"
+    permission_required = organisationChartEntry_add.perm_name()
+    success_url = reverse_lazy("backoffice:team_list")
+    raise_exception = True
+
+
+class TeamMemberUpdateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, UpdateView):
+    model = OrganisationChartEntry
+    fields = ["first_name", "last_name", "role", "description", "photo"]
+    template_name = "backoffice/team/update.html"
+    permission_required = organisationChartEntry_change.perm_name()
+    success_url = reverse_lazy("backoffice:team_list")
+    raise_exception = True
+
+
+class TeamMemberDeleteView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, DeleteView):
+    model = OrganisationChartEntry
+    template_name = "backoffice/team/confirm_delete.html"
+    permission_required = organisationChartEntry_delete.perm_name()
+    success_url = reverse_lazy("backoffice:team_list")
     raise_exception = True

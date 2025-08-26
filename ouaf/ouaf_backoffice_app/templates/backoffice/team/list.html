@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Membres de l'équipe – Backoffice{% endblock %}
+
+{% block content %}
+<section class="teamList" aria-labelledby="teamList-title">
+  <header class="teamList__header">
+    <h1 id="teamList-title">Membres de l'équipe</h1>
+
+    <div class="teamList__actions">
+      <a class="btn btn--primary" href="{% url 'backoffice:team_create' %}">
+        + Ajouter un membre
+      </a>
+    </div>
+  </header>
+
+  {% if object_list %}
+    <ul class="teamList__items" role="list" aria-describedby="teamList-count">
+      <p id="teamList-count" class="teamList__count">
+        {{ object_list|length }} membre{{ object_list|length|pluralize:"s" }}
+      </p>
+
+      {% for member in object_list %}
+        <li class="teamList__item">
+            <article class="teamList__card">
+              <div class="teamList__thumb">
+                {% if member.photo %}
+                  <a class="teamList__link" href="{% url 'backoffice:team_update' member.pk %}"><img
+                    src="{{ member.photo.url }}"
+                    alt="Photo de {{ member.first_name }} {{ member.last_name }}"
+                    loading="lazy"
+                    decoding="async"
+                  /></a>
+                {% else %}
+                  <img
+                    src="{% static 'images/avatar_placeholder.svg' %}"
+                    alt="Photo indisponible pour {{ member.first_name }} {{ member.last_name }}"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                {% endif %}
+              </div>
+
+              <div class="teamList__meta">
+               <a class="teamList__link" href="{% url 'backoffice:team_update' member.pk %}"><h3 class="teamList__name">
+                  {{ member.first_name }} {{ member.last_name }}
+                </h3> </a>
+                {% if member.role %}
+                  <p class="teamList__role">{{ member.role }}</p>
+                {% endif %}
+                {% if member.description %}
+                  <p class="teamList__desc">
+                    {{ member.description|truncatechars:140 }}
+                  </p>
+                {% endif %}
+              </div>
+
+              <div class="teamList__go">Modifier →</div>
+            </article>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="teamList__empty">
+      <p>Aucun membre pour le moment.</p>
+      <p>
+        <a class="btn btn--primary" href="{% url 'backoffice:team_create' %}">
+          Ajouter le premier membre
+        </a>
+      </p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}
