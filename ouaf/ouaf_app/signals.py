@@ -39,13 +39,10 @@ def ensure_roles_and_permission(sender, **kwargs):
     member_perms = {event_view}
     backoffice_perms = {
         event_view, event_add, event_change, event_delete, event_publish, can_change_user_role,
-        service_view, service_add, service_change, service_delete,
         activite_view, activite_add, activite_change, activite_delete,
         person_view, person_change,
         animal_view, animal_add, animal_change, animal_delete,
         # memberpayment_view, memberpayment_add, memberpayment_change, memberpayment_delete,
-
-        service_view, service_add, service_change, service_delete,
 
         organisationChartEntry_view, organisationChartEntry_change, organisationChartEntry_add, organisationChartEntry_delete,
     }
@@ -69,10 +66,6 @@ animal_add = PermissionDefiner("ouaf_app", "animal", "add_animal")
 animal_change = PermissionDefiner("ouaf_app", "animal", "change_animal")
 animal_delete = PermissionDefiner("ouaf_app", "animal", "delete_animal")
 
-service_view = PermissionDefiner("ouaf_app", "service", "view_service")
-service_add = PermissionDefiner("ouaf_app", "service", "add_service")
-service_change = PermissionDefiner("ouaf_app", "service", "change_service")
-service_delete = PermissionDefiner("ouaf_app", "service", "delete_service")
 
 activite_view = PermissionDefiner("ouaf_app", "activite", "view_activite")
 activite_add = PermissionDefiner("ouaf_app", "activite", "add_activite")

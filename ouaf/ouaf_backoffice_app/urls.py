@@ -9,11 +9,6 @@ urlpatterns = [
     path("users/", views.UserListView.as_view(), name="user_list"),
     path("users/<int:pk>/edit/", views.UserUpdateView.as_view(), name="user_edit"),
 
-    path("services/", views.ServiceListView.as_view(), name="service_list"),
-    path("services/new", views.ServiceCreateView.as_view(), name="service_create"),
-    path("services/<int:pk>/update/", views.ServiceUpdateView.as_view(), name="service_update"),
-    path("services/<int:pk>/delete/", views.ServiceDeleteView.as_view(), name="service_delete"),
-
     path("activites/", views.ActiviteListView.as_view(), name="activite_list"),
     path("activites/new", views.ActiviteCreateView.as_view(), name="activite_create"),
     path("activites/<int:pk>/update/", views.ActiviteUpdateView.as_view(), name="activite_update"),

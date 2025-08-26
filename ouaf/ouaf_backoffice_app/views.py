@@ -3,10 +3,9 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, ListView, DeleteView, UpdateView, CreateView
 from .mixins import BackofficeAccessRequiredMixin
-from ouaf_app.models import Event, Animal, Service, Activite, OrganisationChartEntry
+from ouaf_app.models import Event, Animal, Activite, OrganisationChartEntry
 from .forms import PersonEditForm
 from ouaf_app.signals import *
-
 
 User = get_user_model()
 
@@ -20,7 +19,6 @@ class BackofficeHome(BackofficeAccessRequiredMixin, TemplateView):
             {"label": "Utilisateurs", "url": reverse_lazy("backoffice:user_list")},
             {"label": "Événements", "url": reverse_lazy("backoffice:event_list")},
             {"label": "Animaux", "url": reverse_lazy("backoffice:animal_list")},
-            {"label": "Services", "url": reverse_lazy("backoffice:service_list")},
             {"label": "Activites", "url": reverse_lazy("backoffice:activite_list")},
             {"label": "Team Members", "url": reverse_lazy("backoffice:team_list")}
             ##
@@ -83,39 +81,6 @@ class AnimalListView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, Lis
     model = Animal
     template_name = "backoffice/animals/list.html"
     permission_required = animal_view.perm_name()
-    raise_exception = True
-
-
-class ServiceListView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, ListView):
-    model = Service
-    template_name = "backoffice/services/list.html"
-    permission_required = service_view.perm_name()
-    raise_exception = True
-
-
-class ServiceCreateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, CreateView):
-    model = Service
-    fields = ["title", "description", "price", "image"]
-    template_name = "backoffice/services/form.html"
-    permission_required = service_add.perm_name()
-    success_url = reverse_lazy("backoffice:service_list")
-    raise_exception = True
-
-
-class ServiceUpdateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, UpdateView):
-    model = Service
-    fields = ["title", "description", "price", "image"]
-    template_name = "backoffice/services/update.html"
-    permission_required = service_change.perm_name()
-    success_url = reverse_lazy("backoffice:service_list")
-    raise_exception = True
-
-
-class ServiceDeleteView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, DeleteView):
-    model = Service
-    template_name = "backoffice/services/confirm_delete.html"
-    permission_required = service_delete.perm_name()
-    success_url = reverse_lazy('backoffice:service_list')
     raise_exception = True
 
 

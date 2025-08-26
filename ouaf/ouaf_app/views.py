@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required, login_not_required
 from django.views.generic import ListView
 from django.http import HttpRequest
 from .forms import PersonForm, RegistrationForm
-from .models import OrganisationChartEntry, Service, Activite
+from .models import OrganisationChartEntry, Activite
 
 
 # Create your views here.
@@ -62,12 +62,6 @@ def mediation_animale(request):
 
 def confidentialite(request):
     return render(request, "confidentialite.html")
-
-
-class ServiceListView(ListView):
-    model = Service
-    template_name = "services/list.html"
-    raise_exception = True
 
 
 class ActiviteListView(ListView):
