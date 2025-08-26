@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Modifier un membre – Backoffice{% endblock %}
+
+{% block content %}
+<section class="teamUpdate" aria-labelledby="teamUpdate-title">
+  <header class="teamUpdate__header">
+    <h1 id="teamUpdate-title">Modifier un membre</h1>
+    <a class="btn btn--ghost" href="{% url 'backoffice:team_list' %}">← Retour à la liste</a>
+  </header>
+
+  <form class="teamUpdate__form" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="formGrid">
+      <!-- Prénom -->
+      <div class="form__row">
+        <label for="id_first_name" class="form__label">Prénom <span class="form__required">*</span></label>
+        {{ form.first_name }}
+        {% if form.first_name.errors %}
+          <div class="form__errors">{{ form.first_name.errors }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Nom -->
+      <div class="form__row">
+        <label for="id_last_name" class="form__label">Nom <span class="form__required">*</span></label>
+        {{ form.last_name }}
+        {% if form.last_name.errors %}
+          <div class="form__errors">{{ form.last_name.errors }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Rôle -->
+      <div class="form__row span-full">
+        <label for="id_role" class="form__label">Rôle</label>
+        {{ form.role }}
+        {% if form.role.errors %}
+          <div class="form__errors">{{ form.role.errors }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Description -->
+      <div class="form__row span-full">
+        <label for="id_description" class="form__label">Description</label>
+        {{ form.description }}
+        {% if form.description.errors %}
+          <div class="form__errors">{{ form.description.errors }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Photo -->
+      <div class="form__row span-full">
+        <label for="id_photo" class="form__label">Photo</label>
+        {{ form.photo }}
+        {% if form.photo.errors %}
+          <div class="form__errors">{{ form.photo.errors }}</div>
+        {% endif %}
+
+        {% if object.photo %}
+          <div class="form__help">
+            <p>Photo actuelle :</p>
+            <img src="{{ object.photo.url }}" alt="Photo de {{ object.first_name }}" style="max-height:120px;border-radius:8px;margin-top:8px;">
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="account__foot">
+      <button type="submit" class="btn btn--primary">💾 Enregistrer</button>
+      <a class="btn btn--danger" href="{% url 'backoffice:team_delete' object.pk %}">🗑 Supprimer</a>
+    </div>
+  </form>
+</section>
+{% endblock %}
