@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required, login_not_required
 from django.views.generic import ListView
 from django.http import HttpRequest
 from .forms import PersonForm, RegistrationForm
-from .models import OrganisationChartEntry, Service, Activite, Animal, AnimalImage, AnimalVideo
+from .models import OrganisationChartEntry, Service, Activite, Animal, AnimalMedia
 from django.db.models import Prefetch
 
 
@@ -66,17 +66,20 @@ def confidentialite(request):
 
 
 def animal_list(request):
-    animals = Animal.objects.prefetch_related(Prefetch("image2animal", queryset=AnimalImage.objects.filter(is_main_image=True), to_attr="images")).all()
-    context = {"animals": animals}
+    animals = Animal.objects.prefetch_related(Prefetch("media", to_attr="medias")).all()
+    for animal in animals:
+        if animal.medias:
+            pres_image = next(media for media in animal.medias if media.is_image)
+            if pres_image:
+                animal.presentation_image = pres_image.file
+    context = { "animals": animals }
     return render(request, "animals/list.html", context)
 
 def animal_detail(request, animal_id):
     animal = Animal.objects.filter(id=animal_id).first()
-    images = AnimalImage.objects.filter(animal_id=animal_id)
-    videos = AnimalVideo.objects.filter(animal_id=animal_id)
-    context = {"animal": animal, "images": images, "videos": videos}
+    medias = AnimalMedia.objects.filter(animal_id=animal_id)
+    context = { "animal": animal, "medias": medias }
     return render(request, "animals/detail.html", context)
-
 
 
 class ServiceListView(ListView):
@@ -89,4 +92,3 @@ class ActiviteListView(ListView):
     model = Activite
     template_name = "activites/list.html"
     raise_exception = True
-

@@ -9,9 +9,9 @@
     {% for animal in animals %}
     <li>
         <a href="{% url 'animal_detail' animal.id %}">{{ animal.name }} {{ animal.description }}</a>
-        {% for image in animal.images %}
-            <img src="{{ image.image.url }}"/>
-        {% endfor %}
+            {% if animal.presentation_image %}
+                <img src="{{ animal.presentation_image.url }}"/>
+            {% endif %}
     </li>
     <br/>
     {% endfor %}

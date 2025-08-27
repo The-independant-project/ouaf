@@ -1,3 +1,5 @@
+from mimetypes import guess_type
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group
 from django.conf import settings
@@ -65,6 +67,7 @@ class MemberPayment(models.Model):
 class Order(models.Model):
     foreignId = models.UUIDField(null=False, blank=False)
     order = models.IntegerField(null=False, blank=False)
+
 class Animal(models.Model):
     name = models.CharField(max_length=100, null=True)
     description = models.CharField(max_length=1000, null=True)
@@ -73,21 +76,6 @@ class Animal(models.Model):
     pet_amount = models.IntegerField()
     def __str__(self):
         return self.name
-class AnimalImage(models.Model):
-    title = models.CharField(max_length=1000)
-    description = models.CharField(max_length=1000, null=True, blank=True)
-    animal_id = models.ForeignKey(Animal, null=False, blank=False, on_delete=models.CASCADE, related_name="image2animal")
-    image = models.ImageField(upload_to='images/animalImages', null=False, blank=False)
-    is_main_image = models.BooleanField(blank=False)
-    def __str__(self):
-        return f"{self.animal_id.name} - {self.title}"
-class AnimalVideo(models.Model):
-    title = models.CharField(max_length=1000)
-    description = models.CharField(max_length=1000, null=True, blank=True)
-    animal_id = models.ForeignKey(Animal, null=False, blank=False, on_delete=models.CASCADE, related_name="video2animal")
-    video = models.FileField(upload_to='videos/animalVideos', null=False, blank=False)
-    def __str__(self):
-        return f"{self.animal_id.name} - {self.title}"
 
 class OrganisationChartEntry(models.Model):
     first_name = models.CharField(max_length=1000)
@@ -108,3 +96,35 @@ class Activite(models.Model):
     image = models.ImageField(upload_to='images/activites', blank=True)
 
 
+class AbstractMedia(models.Model):
+    file = None
+    url = models.URLField(blank=True)
+    caption = models.CharField(max_length=200, blank=True)
+    position = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        abstract = True
+        ordering = ["position","id"]
+
+    def __str__(self):
+        return self.caption or (self.file.name if self.file else self.url or "media")
+
+    @property
+    def mime(self):
+        src = self.file.name if self.file else self.url
+        m, _ = guess_type(src or "")
+        return m or ""
+
+    @property
+    def is_image(self):
+        return self.mime.startswith("image/")
+
+    @property
+    def is_video(self):
+        return self.mime.startswith("video") or ("youtu" in (self.url or ""))
+
+class AnimalMedia(AbstractMedia):
+    animal = models.ForeignKey(Animal, null=False, blank=False, on_delete=models.CASCADE, related_name='media')
+    file = models.FileField(upload_to="animals/media", null=False, blank=False)
+    def __str__(self):
+        return f"{self.animal.name} - {super().__str__()}"
