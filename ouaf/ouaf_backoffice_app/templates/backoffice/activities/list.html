@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Activités – Backoffice{% endblock %}
+
+{% block content %}
+<section class="boActivities" aria-labelledby="boActivities-title">
+  <header class="boActivities__header">
+    <h1 id="boActivities-title">Activités</h1>
+    <div class="boActivities__actions">
+      <a class="btn btn--primary" href="{% url 'backoffice:activity_create' %}">+ Nouvelle activité</a>
+    </div>
+  </header>
+
+  {% if object_list %}
+    <ul class="boActivities__list" role="list">
+      {% for a in object_list %}
+        <li class="boActivities__item">
+          <article class="boActivities__card">
+            <a class="boActivities__thumbLink" href="{% url 'backoffice:activity_update' a.pk %}">
+              {% if a.image %}
+                <img class="boActivities__thumb" src="{{ a.image.url }}" alt="Visuel de {{ a.title }}" loading="lazy" decoding="async">
+              {% else %}
+                <img class="boActivities__thumb" src="{% static 'images/avatar_placeholder.svg' %}" alt="Aperçu indisponible" loading="lazy" decoding="async">
+              {% endif %}
+            </a>
+
+            <div class="boActivities__meta">
+              <h3 class="boActivities__title">
+                <a class="boActivities__titleLink" href="{% url 'backoffice:activity_update' a.pk %}">{{ a.title }}</a>
+              </h3>
+              {% if a.category %}
+                <p class="boActivities__category">{{ a.category.title }}</p>
+              {% endif %}
+              {% if a.description %}
+                <p class="boActivities__desc">{{ a.description|truncatechars:140 }}</p>
+              {% endif %}
+              <p class="boActivities__medias">
+                Médias liés : {{ a.media.count }}
+              </p>
+            </div>
+
+            <div class="boActivities__actionsRow">
+              <a class="btn btn--ghost" href="{% url 'backoffice:activity_detail' a.pk %}">Voir</a>
+              <a class="btn btn--primary" href="{% url 'backoffice:activity_update' a.pk %}">Modifier</a>
+              <a class="btn btn--danger" href="{% url 'backoffice:activity_delete' a.pk %}">Supprimer</a>
+            </div>
+          </article>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="boActivities__empty">
+      <p>Aucune activité pour le moment.</p>
+      <p><a class="btn btn--primary" href="{% url 'backoffice:activity_create' %}">Créer la première activité</a></p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

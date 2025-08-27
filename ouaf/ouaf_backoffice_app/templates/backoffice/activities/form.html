@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+{% block title %}Nouvelle activité – Backoffice{% endblock %}
+
+{% block content %}
+    <section class="account" aria-labelledby="activity-form-title">
+        <div class="account__card">
+            <header class="account__head">
+                <h1 id="activity-form-title" class="account__title">Créer une activité</h1>
+                <p class="account__meta">Renseignez l’activité et ajoutez plusieurs médias (fichier OU URL).</p>
+            </header>
+            {% if form.errors %}
+                <pre class="form__errors">{{ form.errors }}</pre>
+            {% endif %}
+
+            <form class="account__body" method="post" enctype="multipart/form-data"
+                  action="{% url 'backoffice:activity_create' %}">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="form__nonfield">{{ form.non_field_errors }}</div>
+                {% endif %}
+
+                <div class="formGrid">
+                    <div class="form__row span-full">
+                        <label class="form__label" for="{{ form.title.id_for_label }}">Titre <span
+                                class="form__required">*</span></label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                            <div class="form__errors">{{ form.title.errors }}</div>{% endif %}
+                    </div>
+
+                    <div class="form__row span-full">
+                        <label class="form__label" for="{{ form.description.id_for_label }}">Description <span
+                                class="form__required">*</span></label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div class="form__errors">{{ form.description.errors }}</div>{% endif %}
+                    </div>
+
+
+                    <div class="form__row">
+                        <label class="form__label" for="{{ form.category.id_for_label }}">Catégorie</label>
+                        <div style="display:flex; gap:.5rem; align-items:center; flex-wrap:wrap;">
+                            {{ form.category }}
+                            <a href="{% url 'backoffice:activity_category_modal' %}"
+                               class="btn btn--ghost js-open-cat"
+                               data-modal-url="{% url 'backoffice:activity_category_modal' %}">
+                                + Nouvelle catégorie
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+
+                <hr class="sep"/>
+
+                <h2 class="account__title" style="margin-top:1rem;">Médias</h2>
+
+                {{ media_formset.management_form }}
+                <div id="media-forms" class="formGrid">
+                    {% for mf in media_formset %}
+                        <div class="form__row span-full"
+                             style="border:1px dashed var(--clr-primary-dark); padding:1rem; border-radius:var(--radius);">
+                            <p class="form__label"><strong>Média #{{ forloop.counter }}</strong></p>
+
+                            <div class="formGrid">
+                                <div class="form__row">
+                                    <label class="form__label" for="{{ mf.file.id_for_label }}">Fichier</label>
+                                    {{ mf.file }}
+                                </div>
+
+                                <div class="form__row">
+                                    <label class="form__label" for="{{ mf.url.id_for_label }}">URL</label>
+                                    {{ mf.url }}
+                                    <p class="form__help">Ex. image/vidéo distante ou URL YouTube.</p>
+                                </div>
+
+                                <div class="form__row">
+                                    <label class="form__label" for="{{ mf.caption.id_for_label }}">Légende</label>
+                                    {{ mf.caption }}
+                                </div>
+
+                                <div class="form__row">
+                                    <label class="form__label" for="{{ mf.position.id_for_label }}">Position</label>
+                                    {{ mf.position }}
+                                </div>
+
+                                {% if mf.DELETE %}
+                                    <div class="form__row">
+                                        <label class="form__label" for="{{ mf.DELETE.id_for_label }}">Supprimer</label>
+                                        {{ mf.DELETE }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            {% if mf.non_field_errors %}
+                                <div class="form__errors">{{ mf.non_field_errors }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div style="margin-top:.75rem;">
+                    <button type="button" class="btn btn--ghost" id="add-media">+ Ajouter un média</button>
+                </div>
+
+                <footer class="account__foot">
+                    <a class="btn btn--ghost" href="{% url 'backoffice:activity_list' %}">Annuler</a>
+                    <button class="btn btn--primary" type="submit">Créer</button>
+                </footer>
+            </form>
+            {# Modal #}
+            <dialog id="catModal"
+                    style="max-width:600px; width:clamp(320px, 90vw, 600px); border:1px solid var(--clr-primary-dark); border-radius: var(--radius); padding:0;">
+                <div class="account__card" style="margin:0; border:none; box-shadow:none;">
+                    <header class="account__head">
+                        <h2 class="account__title" style="margin:0;">Créer une catégorie</h2>
+                        <p class="account__meta">Ajoutez une nouvelle catégorie sans quitter la page.</p>
+                    </header>
+                    <div id="catModalContent" class="account__body">
+                        <!-- MODAL HERE -->
+                    </div>
+                </div>
+            </dialog>
+
+        </div>
+    </section>
+
+    <script>
+        (function () {
+            const addBtn = document.getElementById('add-media');
+            const container = document.getElementById('media-forms');
+            const totalForms = document.getElementById('{{ media_formset.management_form.prefix }}-TOTAL_FORMS') ||
+                document.querySelector('input[name$="-TOTAL_FORMS"]');
+
+            // Construit un bloc vide à partir du dernier formulaire en remplaçant l'index
+            function buildEmptyForm(nextIndex) {
+                // On prend le premier formulaire comme base (ou le dernier)
+                const sample = container.querySelector('.form__row.span-full');
+                const clone = sample.cloneNode(true);
+
+                // Nettoie les inputs
+                clone.querySelectorAll('input, textarea').forEach(el => {
+                    // Remplace l'index [\d+] par nextIndex dans name/id/for
+                    if (el.name) el.name = el.name.replace(/\-\d+\-/g, `-${nextIndex}-`);
+                    if (el.id) el.id = el.id.replace(/\-\d+\-/g, `-${nextIndex}-`);
+                    if (el.getAttribute('for')) {
+                        el.setAttribute('for', el.getAttribute('for').replace(/\-\d+\-/g, `-${nextIndex}-`));
+                    }
+                    // Valeurs par défaut
+                    if (el.type === 'checkbox' || el.type === 'radio') {
+                        el.checked = false;
+                    } else {
+                        el.value = '';
+                    }
+                });
+
+                // Supprimer la case DELETE si présente (pour un nouveau formulaire)
+                const delWrap = clone.querySelector('[name$="-DELETE"]')?.closest('.form__row');
+                if (delWrap) delWrap.remove();
+
+                // Mettre à jour le titre "Média #n"
+                const label = clone.querySelector('p.form__label strong');
+                if (label) label.textContent = `Média #${nextIndex + 1}`;
+
+                return clone;
+            }
+
+            addBtn?.addEventListener('click', () => {
+                const nextIndex = parseInt(totalForms.value, 10);
+                const newBlock = buildEmptyForm(nextIndex);
+                container.appendChild(newBlock);
+                totalForms.value = nextIndex + 1;
+            });
+        })();
+    </script>
+
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const openBtn = document.querySelector('.js-open-cat');
+            const modal = document.getElementById('catModal');
+            const content = document.getElementById('catModalContent');
+            const categorySelect = document.getElementById('id_category'); // id Django par défaut
+
+            if (!openBtn || !modal || !content || !categorySelect) return;
+
+            function wireModalEvents(root) {
+                // Fermer modal
+                root.querySelectorAll('[data-close-modal]').forEach(btn => {
+                    btn.addEventListener('click', () => modal.close());
+                });
+
+                // Submit AJAX
+                const form = root.querySelector('#catForm');
+                if (form) {
+                    form.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        const fd = new FormData(form);
+                        try {
+                            const res = await fetch(form.action, {
+                                method: 'POST',
+                                body: fd,
+                                headers: {'X-Requested-With': 'XMLHttpRequest'},
+                            });
+
+                            // Succès: JSON {id, title}
+                            if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
+                                const data = await res.json();
+                                // Ajoute l’option et sélectionne-la
+                                const opt = new Option(data.title, data.id, true, true);
+                                categorySelect.add(opt);
+                                categorySelect.value = data.id;
+                                modal.close();
+                                return;
+                            }
+
+                            // Erreurs de formulaire : on réinjecte le HTML du partiel
+                            const html = await res.text();
+                            content.innerHTML = html;
+                            wireModalEvents(content);
+                        } catch (err) {
+                            console.error(err);
+                        }
+                    });
+                }
+            }
+
+            openBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const url = openBtn.dataset.modalUrl || openBtn.href;
+                try {
+                    const res = await fetch(url, {headers: {'X-Requested-With': 'XMLHttpRequest'}});
+                    const html = await res.text();
+                    content.innerHTML = html;
+                    wireModalEvents(content);
+                    if (typeof modal.showModal === 'function') {
+                        modal.showModal();
+                    } else {
+                        // Fallback vieux navigateurs
+                        modal.setAttribute('open', 'open');
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            });
+        });
+    </script>
+
+
+
+
+{% endblock %}

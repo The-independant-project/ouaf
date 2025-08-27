@@ -1,3 +1,5 @@
+from mimetypes import guess_type
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group
 from django.conf import settings
@@ -84,9 +86,44 @@ class ActivityCategory(models.Model):
     title = models.CharField(max_length=100)
     image = models.ImageField(upload_to='images/categories')
 
+    def __str__(self):
+        return self.title
 
-class Activite(models.Model):
+
+class Activity(models.Model):
     title = models.CharField(max_length=1000)
-    category = models.ForeignKey(ActivityCategory, null=True, on_delete=models.CASCADE)
+    category = models.ForeignKey(ActivityCategory, null=True, blank=True, on_delete=models.CASCADE)
     description = models.TextField()
-    image = models.ImageField(upload_to='images/activites', blank=True)
+
+
+class AbstractMedia(models.Model):
+    # activity = models.ForeignKey(Activity, on_delete=models.CASCADE(), related_name='media')
+    url = models.URLField(blank=True)
+    caption = models.CharField(max_length=200, blank=True)
+    position = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        abstract = True
+        ordering = ["position", "id"]
+
+    def __str__(self):
+        return self.caption or (self.file.name if self.file else self.url or "media")
+
+    @property
+    def mime(self):
+        src = self.file.name if self.file else self.url
+        m, _ = guess_type(src or "")
+        return m or ""
+
+    @property
+    def is_image(self):
+        return self.mime.startswith("image/")
+
+    @property
+    def is_video(self):
+        return self.mime.startswith("video") or ("youtu" in (self.url or ""))
+
+
+class ActivityMedia(AbstractMedia):
+    activity = models.ForeignKey(Activity, on_delete=models.CASCADE, related_name="media")
+    file = models.FileField(upload_to='activities/media', blank=True)

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Supprimer l’activité – Backoffice{% endblock %}
+
+{% block content %}
+<section class="account" aria-labelledby="activity-delete-title">
+  <div class="account__card">
+    <header class="account__head">
+      <h1 id="activity-delete-title" class="account__title">Supprimer l’activité</h1>
+      <p class="account__meta">
+        Voulez-vous vraiment supprimer <strong>{{ object.title }}</strong> ?
+      </p>
+    </header>
+
+    <form class="account__body" method="post" action="{% url 'backoffice:activity_delete' object.pk %}">
+      {% csrf_token %}
+      <p class="form__help">Cette action est irréversible. Les médias liés seront également supprimés.</p>
+      <footer class="account__foot">
+        <a class="btn btn--ghost" href="{% url 'backoffice:activity_list' %}">Annuler</a>
+        <button class="btn btn--danger" type="submit">Confirmer la suppression</button>
+      </footer>
+    </form>
+  </div>
+</section>
+{% endblock %}
