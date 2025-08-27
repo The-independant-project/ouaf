@@ -227,9 +227,6 @@ class ActivityDetailView(BackofficeAccessRequiredMixin, PermissionRequiredMixin,
         return ctx
 
 
-from django.db import transaction
-
-
 class ActivityUpdateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Activity
     fields = ["title", "category", "description"]
