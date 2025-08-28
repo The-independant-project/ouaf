@@ -90,43 +90,6 @@ class AnimalListView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, Lis
     raise_exception = True
 
 
-# class ActivityMediaForm(forms.ModelForm):
-#     class Meta:
-#         model = ActivityMedia
-#         fields = ["file", "url", "caption", "position"]
-#
-#     def clean(self):
-#         cleaned = super().clean()
-#         file = cleaned.get("file")
-#         url = cleaned.get("url")
-#         if not self.has_changed():
-#             return cleaned
-#         if not file and not url:
-#             raise forms.ValidationError("Fournissez un fichier OU une URL.")
-#         if file and url:
-#             raise forms.ValidationError("Choisissez un fichier OU une URL, pas les deux.")
-#         return cleaned
-
-
-ActivityMediaFormSet = inlineformset_factory(
-    Activity,
-    ActivityMedia,
-    # form=ActivityMediaForm,
-    fields=["file", "url", "caption", "position"],
-    extra=2,
-    can_delete=True
-)
-
-
-# ActivityMediaFormSetUpdate = inlineformset_factory(
-#     Activity,
-#     ActivityMedia,
-#     fields=["file", "url", "caption", "position"],
-#     extra=0,
-#     can_delete=True
-# )
-
-
 class ActivityListView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, ListView):
     model = Activity
     template_name = "backoffice/activities/list.html"
@@ -149,32 +112,41 @@ class ActivityCreateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin,
     success_url = reverse_lazy("backoffice:activity_list")
     raise_exception = True
 
+    def _create_formset_class(self):
+        return inlineformset_factory(
+            Activity,
+            ActivityMedia,
+            fields=["file", "url", "caption", "position"],
+            extra=2,
+            can_delete=True,
+        )
+
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        if self.request.method == "GET":
-            ctx["media_formset"] = ActivityMediaFormSet()
+        FormSet = self._create_formset_class()
+        if self.request.method == "POST":
+            ctx["media_formset"] = FormSet(self.request.POST, self.request.FILES)
         else:
-            ctx["media_formset"] = ActivityMediaFormSet(self.request.POST, self.request.FILES)
+            ctx["media_formset"] = FormSet()
         return ctx
 
-    def form_valid(self, form):
-        print("JE SOUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUIS VALIIIIIIIIIIIIIIIIIIIIIIIIIIID", )
-        self.object = form.save()
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        form = self.get_form()
+        FormSet = self._create_formset_class()
+        media_formset = FormSet(request.POST, request.FILES)
 
-        media_formset = ActivityMediaFormSet(self.request.POST, self.request.FILES, instance=self.object)
-        if media_formset.is_valid():
-            media_formset.save()
-            messages.success(self.request, "Activité créée.")
+        if form.is_valid() and media_formset.is_valid():
+            with transaction.atomic():
+                self.object = form.save()
+                media_formset.instance = self.object
+                media_formset.save()
+
+            messages.success(request, "Activité créée.")
             return redirect(self.get_success_url())
 
         context = self.get_context_data(form=form)
         context["media_formset"] = media_formset
-        return self.render_to_response(context)
-
-    def form_invalid(self, form):
-        print("PAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAS VALIIIIIIIIIIIIIIIIIIIIID",
-              form.errors.as_json())
-        context = self.get_context_data(form=form)
         return self.render_to_response(context)
 
 
@@ -193,7 +165,6 @@ class ActivityCategoryCreateModalView(BackofficeAccessRequiredMixin, PermissionR
         obj = form.save()
         if _is_ajax(self.request):
             return JsonResponse({"id": obj.id, "title": obj.title})
-        # fallback (pas utilisé ici)
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -210,7 +181,6 @@ class ActivityCategoryCreateView(BackofficeAccessRequiredMixin, PermissionRequir
     raise_exception = True
 
     def get_success_url(self):
-        # Retourne sur le formulaire appelant si "next" est fourni
         nxt = self.request.GET.get("next") or self.request.POST.get("next")
         return nxt or reverse_lazy("backoffice:activity_create")
 
@@ -258,15 +228,19 @@ class ActivityUpdateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin,
         form = self.get_form()
         UpdateFormSet = self._update_formset_class()
         media_formset = UpdateFormSet(request.POST, request.FILES, instance=self.object)
+
         if form.is_valid() and media_formset.is_valid():
             with transaction.atomic():
                 self.object = form.save()
                 media_formset.save()
             messages.success(request, "Activité mise à jour.")
             return redirect(self.get_success_url())
-        context = self.get_context_data(form=form)
-        context["media_formset"] = media_formset
-        return self.render_to_response(context)
+
+        return self.render_to_response({
+            "form": form,
+            "object": self.object,
+            "media_formset": media_formset,
+        })
 
 
 class ActivityDeleteView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, DeleteView):
