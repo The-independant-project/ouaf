@@ -1,3 +1,5 @@
+from mimetypes import guess_type
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group
 from django.conf import settings
@@ -25,11 +27,14 @@ class Person(AbstractUser):
     city = models.CharField(max_length=100)
     country = models.CharField(max_length=100)
     newsletter_subscription = models.BooleanField(default=False)
+
     def belongs_to_group(self, group_name):
         return self.groups.filter(name=group_name).exists()
+
     def set_group(self, group_name, value):
         group = Group.objects.get(name=group_name)
         self.groups.add(group) if value else self.groups.remove(group)
+
     class Meta:
         permissions = [
             ("can_change_user_role", "Can change user roles")
@@ -50,11 +55,11 @@ class Event(models.Model):
     longitude = models.FloatField()
     is_published = models.BooleanField(default=False)
 
-
     class Meta:
         permissions = [
-            ("can_publish_event","Can publish an event"),
+            ("can_publish_event", "Can publish an event"),
         ]
+
 
 class MemberPayment(models.Model):
     personId = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)  # index
@@ -76,13 +81,49 @@ class OrganisationChartEntry(models.Model):
     description = models.TextField(max_length=1000)
     photo = models.ImageField(upload_to='images/organisationChart', blank=True)
 
-class Service(models.Model):
-    title = models.CharField(max_length=1000)
-    description = models.TextField()
-    price = models.FloatField()
-    image = models.ImageField(upload_to='images/services', blank=True)
 
-class Activite(models.Model):
+class ActivityCategory(models.Model):
+    title = models.CharField(max_length=100)
+    image = models.ImageField(upload_to='images/categories')
+
+    def __str__(self):
+        return self.title
+
+
+class Activity(models.Model):
     title = models.CharField(max_length=1000)
+    category = models.ForeignKey(ActivityCategory, null=True, blank=True, on_delete=models.CASCADE)
     description = models.TextField()
-    image = models.ImageField(upload_to='images/activites', blank=True)
+
+
+class AbstractMedia(models.Model):
+    # activity = models.ForeignKey(Activity, on_delete=models.CASCADE(), related_name='media')
+    url = models.URLField(blank=True)
+    caption = models.CharField(max_length=200, blank=True)
+    position = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        abstract = True
+        ordering = ["position", "id"]
+
+    def __str__(self):
+        return self.caption or (self.file.name if self.file else self.url or "media")
+
+    @property
+    def mime(self):
+        src = self.file.name if self.file else self.url
+        m, _ = guess_type(src or "")
+        return m or ""
+
+    @property
+    def is_image(self):
+        return self.mime.startswith("image/")
+
+    @property
+    def is_video(self):
+        return self.mime.startswith("video") or ("youtu" in (self.url or ""))
+
+
+class ActivityMedia(AbstractMedia):
+    activity = models.ForeignKey(Activity, on_delete=models.CASCADE, related_name="media")
+    file = models.FileField(upload_to='activities/media', blank=True)

@@ -71,5 +71,5 @@ class AnimalAdmin(admin.ModelAdmin):
 #     autocomplete_fields = ("personId",)
 
 admin.site.register(OrganisationChartEntry)
-admin.site.register(Service)
-admin.site.register(Activite)
+admin.site.register(Activity)
+admin.site.register(ActivityCategory)

@@ -1,0 +1,23 @@
+<form id="catForm" method="post" enctype="multipart/form-data"
+      action="{% url 'backoffice:activity_category_modal' %}">
+  {% csrf_token %}
+
+  <div class="formGrid">
+    <div class="form__row span-full">
+      <label class="form__label" for="{{ form.title.id_for_label }}">Titre <span class="form__required">*</span></label>
+      {{ form.title }}
+      {% if form.title.errors %}<div class="form__errors">{{ form.title.errors }}</div>{% endif %}
+    </div>
+
+    <div class="form__row span-full">
+      <label class="form__label" for="{{ form.image.id_for_label }}">Image</label>
+      {{ form.image }}
+      {% if form.image.errors %}<div class="form__errors">{{ form.image.errors }}</div>{% endif %}
+    </div>
+  </div>
+
+  <footer class="account__foot">
+    <button type="button" class="btn btn--ghost" data-close-modal>Annuler</button>
+    <button type="submit" class="btn btn--primary">Créer</button>
+  </footer>
+</form>
