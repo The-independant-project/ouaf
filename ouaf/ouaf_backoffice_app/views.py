@@ -16,6 +16,11 @@ from django.db import transaction
 User = get_user_model()
 
 
+#On top of the page for better compatibility
+def _is_ajax(request):
+    return request.headers.get("x-requested-with") == "XMLHttpRequest"
+
+
 class BackofficeHome(BackofficeAccessRequiredMixin, TemplateView):
     template_name = "backoffice/home.html"
 
@@ -148,10 +153,6 @@ class ActivityCreateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin,
         context = self.get_context_data(form=form)
         context["media_formset"] = media_formset
         return self.render_to_response(context)
-
-
-def _is_ajax(request):
-    return request.headers.get("x-requested-with") == "XMLHttpRequest"
 
 
 class ActivityCategoryCreateModalView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, CreateView):
