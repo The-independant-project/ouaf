@@ -151,7 +151,6 @@ class ActivityCreateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin,
             return redirect(self.get_success_url())
 
         context = self.get_context_data(form=form)
-        context["media_formset"] = media_formset
         return self.render_to_response(context)
 
 
