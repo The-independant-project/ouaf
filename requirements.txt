@@ -5,3 +5,4 @@ python-dotenv
 pillow
 gunicorn
 whitenoise
+django-debug-toolbar
