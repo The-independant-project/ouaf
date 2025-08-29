@@ -1,14 +1,24 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django import forms
+from django.contrib import messages
+from django.forms import inlineformset_factory
+from django.http import JsonResponse
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView, ListView, DeleteView, UpdateView, CreateView
+from django.views.generic import TemplateView, ListView, DeleteView, UpdateView, CreateView, DetailView
 from .mixins import BackofficeAccessRequiredMixin
-from ouaf_app.models import Event, Animal, Service, Activite, OrganisationChartEntry
+from ouaf_app.models import Event, Animal, Activity, OrganisationChartEntry, ActivityMedia, ActivityCategory
 from .forms import PersonEditForm
 from ouaf_app.signals import *
-
+from django.db import transaction
 
 User = get_user_model()
+
+
+#On top of the page for better compatibility
+def _is_ajax(request):
+    return request.headers.get("x-requested-with") == "XMLHttpRequest"
 
 
 class BackofficeHome(BackofficeAccessRequiredMixin, TemplateView):
@@ -20,8 +30,7 @@ class BackofficeHome(BackofficeAccessRequiredMixin, TemplateView):
             {"label": "Utilisateurs", "url": reverse_lazy("backoffice:user_list")},
             {"label": "Événements", "url": reverse_lazy("backoffice:event_list")},
             {"label": "Animaux", "url": reverse_lazy("backoffice:animal_list")},
-            {"label": "Services", "url": reverse_lazy("backoffice:service_list")},
-            {"label": "Activites", "url": reverse_lazy("backoffice:activite_list")},
+            {"label": "Activites", "url": reverse_lazy("backoffice:activity_list")},
             {"label": "Team Members", "url": reverse_lazy("backoffice:team_list")}
             ##
         ]
@@ -86,69 +95,159 @@ class AnimalListView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, Lis
     raise_exception = True
 
 
-class ServiceListView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, ListView):
-    model = Service
-    template_name = "backoffice/services/list.html"
-    permission_required = service_view.perm_name()
+class ActivityListView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, ListView):
+    model = Activity
+    template_name = "backoffice/activities/list.html"
+    permission_required = activity_view.perm_name()
     raise_exception = True
 
+    def get_queryset(self):
+        return (
+            Activity.objects
+            .all()
+            .prefetch_related("media")
+        )
 
-class ServiceCreateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, CreateView):
-    model = Service
-    fields = ["title", "description", "price", "image"]
-    template_name = "backoffice/services/form.html"
-    permission_required = service_add.perm_name()
-    success_url = reverse_lazy("backoffice:service_list")
+
+class ActivityCreateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, CreateView):
+    model = Activity
+    fields = ["title", "category", "description"]
+    template_name = "backoffice/activities/form.html"
+    permission_required = activity_add.perm_name()
+    success_url = reverse_lazy("backoffice:activity_list")
     raise_exception = True
 
+    def _create_formset_class(self):
+        return inlineformset_factory(
+            Activity,
+            ActivityMedia,
+            fields=["file", "url", "caption", "position"],
+            extra=2,
+            can_delete=True,
+        )
 
-class ServiceUpdateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, UpdateView):
-    model = Service
-    fields = ["title", "description", "price", "image"]
-    template_name = "backoffice/services/update.html"
-    permission_required = service_change.perm_name()
-    success_url = reverse_lazy("backoffice:service_list")
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        FormSet = self._create_formset_class()
+        if self.request.method == "POST":
+            ctx["media_formset"] = FormSet(self.request.POST, self.request.FILES)
+        else:
+            ctx["media_formset"] = FormSet()
+        return ctx
+
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        form = self.get_form()
+        FormSet = self._create_formset_class()
+        media_formset = FormSet(request.POST, request.FILES)
+
+        if form.is_valid() and media_formset.is_valid():
+            with transaction.atomic():
+                self.object = form.save()
+                media_formset.instance = self.object
+                media_formset.save()
+
+            messages.success(request, "Activité créée.")
+            return redirect(self.get_success_url())
+
+        context = self.get_context_data(form=form)
+        return self.render_to_response(context)
+
+
+class ActivityCategoryCreateModalView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, CreateView):
+    model = ActivityCategory
+    fields = ["title", "image"]
+    template_name = "backoffice/activities/partials/category_form.html"
+    permission_required = activity_add.perm_name()
     raise_exception = True
 
+    def form_valid(self, form):
+        obj = form.save()
+        if _is_ajax(self.request):
+            return JsonResponse({"id": obj.id, "title": obj.title})
+        return super().form_valid(form)
 
-class ServiceDeleteView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, DeleteView):
-    model = Service
-    template_name = "backoffice/services/confirm_delete.html"
-    permission_required = service_delete.perm_name()
-    success_url = reverse_lazy('backoffice:service_list')
+    def form_invalid(self, form):
+        if _is_ajax(self.request):
+            return self.render_to_response(self.get_context_data(form=form), status=400)
+        return super().form_invalid(form)
+
+
+class ActivityCategoryCreateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, CreateView):
+    model = ActivityCategory
+    fields = ["title", "image"]
+    template_name = "backoffice/activities/category_form.html"
+    permission_required = activity_add.perm_name()
     raise_exception = True
 
+    def get_success_url(self):
+        nxt = self.request.GET.get("next") or self.request.POST.get("next")
+        return nxt or reverse_lazy("backoffice:activity_create")
 
-class ActiviteListView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, ListView):
-    model = Activite
-    template_name = "backoffice/activites/list.html"
-    permission_required = activite_view.perm_name()
+
+class ActivityDetailView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, DetailView):
+    model = Activity
+    template_name = "backoffice/activities/detail.html"
+    permission_required = activity_view.perm_name()
     raise_exception = True
 
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["media_list"] = self.object.media.all().order_by("position", "id")
+        return ctx
 
-class ActiviteCreateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, CreateView):
-    model = Activite
-    fields = ["title", "description", "image"]
-    template_name = "backoffice/activites/form.html"
-    permission_required = activite_add.perm_name()
-    success_url = reverse_lazy("backoffice:activite_list")
+
+class ActivityUpdateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, UpdateView):
+    model = Activity
+    fields = ["title", "category", "description"]
+    template_name = "backoffice/activities/update.html"
+    permission_required = activity_change.perm_name()
+    success_url = reverse_lazy("backoffice:activity_list")
     raise_exception = True
 
+    def _update_formset_class(self):
+        return inlineformset_factory(
+            Activity,
+            ActivityMedia,
+            fields=["file", "url", "caption", "position"],
+            extra=0,
+            can_delete=True
+        )
 
-class ActiviteUpdateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, UpdateView):
-    model = Activite
-    fields = ["title", "description", "image"]
-    template_name = "backoffice/activites/update.html"
-    permission_required = activite_change.perm_name()
-    success_url = reverse_lazy("backoffice:activite_list")
-    raise_exception = True
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        UpdateFormSet = self._update_formset_class()
+        if self.request.method == "POST":
+            ctx["media_formset"] = UpdateFormSet(self.request.POST, self.request.FILES, instance=self.object)
+        else:
+            ctx["media_formset"] = UpdateFormSet(instance=self.object)
+        return ctx
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        UpdateFormSet = self._update_formset_class()
+        media_formset = UpdateFormSet(request.POST, request.FILES, instance=self.object)
+
+        if form.is_valid() and media_formset.is_valid():
+            with transaction.atomic():
+                self.object = form.save()
+                media_formset.save()
+            messages.success(request, "Activité mise à jour.")
+            return redirect(self.get_success_url())
+
+        return self.render_to_response({
+            "form": form,
+            "object": self.object,
+            "media_formset": media_formset,
+        })
 
 
-class ActiviteDeleteView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, DeleteView):
-    model = Activite
-    template_name = "backoffice/activites/confirm_delete.html"
-    permission_required = activite_delete.perm_name()
-    success_url = reverse_lazy('backoffice:activite_list')
+class ActivityDeleteView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, DeleteView):
+    model = Activity
+    template_name = "backoffice/activities/confirm_delete.html"
+    permission_required = activity_delete.perm_name()
+    success_url = reverse_lazy("backoffice:activity_list")
     raise_exception = True
 
 

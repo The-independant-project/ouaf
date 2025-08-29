@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Détail activité – Backoffice{% endblock %}
+
+{% block content %}
+<section class="boActivityDetail" aria-labelledby="activity-detail-title">
+  <header class="boActivityDetail__header">
+    <h1 id="activity-detail-title">{{ object.title }}</h1>
+    <div class="boActivityDetail__actions">
+      <a class="btn btn--primary" href="{% url 'backoffice:activity_update' object.pk %}">Modifier</a>
+      <a class="btn btn--danger" href="{% url 'backoffice:activity_delete' object.pk %}">Supprimer</a>
+      <a class="btn btn--ghost" href="{% url 'backoffice:activity_list' %}">Retour</a>
+    </div>
+  </header>
+
+  <article class="boActivityDetail__content">
+    {% if object.category %}
+      <p><strong>Catégorie :</strong> {{ object.category.title }}</p>
+    {% endif %}
+
+    {% if object.image %}
+      <p>
+        <img src="{{ object.image.url }}" alt="Visuel {{ object.title }}" style="max-width:340px;height:auto;border-radius:8px;border:1px solid var(--clr-primary-dark);">
+      </p>
+    {% endif %}
+
+    {% if object.description %}
+      <h2>Description</h2>
+      <p>{{ object.description }}</p>
+    {% endif %}
+
+    <h2>Médias</h2>
+    {% if media_list %}
+      <ul class="boActivityDetail__media" role="list" style="display:flex;flex-wrap:wrap;gap:1rem;padding:0;margin:0;">
+        {% for m in media_list %}
+          <li style="list-style:none;max-width:280px;">
+            {% if m.is_image %}
+              <img src="{{ m.file.url|default:m.url }}" alt="{{ m.caption }}" style="width:100%;height:auto;border-radius:6px;border:1px solid #eee;">
+            {% elif m.is_video %}
+              {% if 'youtu' in m.url %}
+                <a class="btn btn--ghost" href="{{ m.url }}" target="_blank" rel="noopener">Ouvrir la vidéo</a>
+              {% else %}
+                <video src="{{ m.file.url|default:m.url }}" controls style="width:100%;border-radius:6px;"></video>
+              {% endif %}
+            {% else %}
+              <a href="{{ m.file.url|default:m.url }}" target="_blank" rel="noopener">Voir le média</a>
+            {% endif %}
+            {% if m.caption %}
+              <p class="form__help" style="margin:.25rem 0 0;">{{ m.caption }}</p>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="form__help">Aucun média associé.</p>
+    {% endif %}
+  </article>
+</section>
+{% endblock %}
