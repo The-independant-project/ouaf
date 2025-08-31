@@ -850,6 +850,8 @@ body.no-scroll {
 }
 
 .activities__row {
+  border-bottom: solid 1px #f9cac2;
+  margin-bottom: 5rem;
   display: grid;
   gap: var(--space-6);
   grid-template-columns: minmax(0,1fr) minmax(0,1fr);
@@ -1013,7 +1015,9 @@ body.no-scroll {
 
 @media (max-width: 768px){
   .activities { padding: var(--space-6) var(--space-4); }
-  .activities__rows { gap: var(--space-6); }
+  .activities__rows {
+    gap: var(--space-6);
+  }
   .activities__header { margin-bottom: var(--space-6); }
 
   .activities__media,
