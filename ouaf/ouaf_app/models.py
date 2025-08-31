@@ -127,3 +127,6 @@ class AbstractMedia(models.Model):
 class ActivityMedia(AbstractMedia):
     activity = models.ForeignKey(Activity, on_delete=models.CASCADE, related_name="media")
     file = models.FileField(upload_to='activities/media', blank=True)
+
+    class Meta:
+        ordering = ["position", "id"]
