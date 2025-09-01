@@ -1,10 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import login_required, login_not_required
-from django.views.generic import ListView
+from django.urls import reverse_lazy
+from django.views.generic import ListView, FormView
 from django.http import HttpRequest
-from .forms import PersonForm, RegistrationForm
+from .forms import PersonForm, RegistrationForm, ContactForm
 from .models import OrganisationChartEntry, Activity, ActivityCategory
+from django.contrib import messages
+
 
 
 # Create your views here.
@@ -82,3 +85,16 @@ class ActivitiesByCategoryView(ListView):
         ctx = super().get_context_data(**kwargs)
         ctx["category"] = ActivityCategory.objects.get(pk=self.kwargs["pk"])
         return ctx
+
+
+class ContactView(FormView):
+    template_name = "contact/contact.html"
+    form_class = ContactForm
+
+    def get_success_url(self):
+        return reverse_lazy("contact")
+
+    def form_valid(self, form):
+        #!!!!!!!!!!! here mail server !!!!!!!!!!!!!!!!!
+        messages.success(self.request, "Merci ! Votre message a bien été enregistré. Nous vous répondrons au plus vite.")
+        return super().form_valid(form)

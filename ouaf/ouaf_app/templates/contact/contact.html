@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block subtitle %} – Contact{% endblock %}
+
+{% block content %}
+    <section class="contact">
+        <header class="contact__header" aria-labelledby="contact-title">
+            <h1 id="contact-title">Contactez l’association</h1>
+            <p class="contact__intro">Remplissez le formulaire ci-dessous, nous reviendrons vers vous rapidement.</p>
+        </header>
+
+        {% if messages %}
+            <div class="contact__messages">
+                {% for message in messages %}
+                    <p class="contact__message {{ message.tags }}">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" class="contactForm" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="contactForm__nonfield">
+                    {% for err in form.non_field_errors %}<p>{{ err }}</p>{% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="contactForm__grid">
+                <div class="form__row">
+                    <label for="{{ form.first_name.id_for_label }}" class="form__label">Prénom <span
+                            class="form__required">*</span></label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                        <div class="form__errors">
+                            {% for e in form.first_name.errors %}<p>{{ e }}</p>{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form__row">
+                    <label for="{{ form.last_name.id_for_label }}" class="form__label">Nom <span class="form__required">*</span></label>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                        <div class="form__errors">
+                            {% for e in form.last_name.errors %}<p>{{ e }}</p>{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form__row">
+                    <label for="{{ form.email.id_for_label }}" class="form__label">E-mail <span
+                            class="form__required">*</span></label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <div class="form__errors">
+                            {% for e in form.email.errors %}<p>{{ e }}</p>{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form__row">
+                    <label for="{{ form.phone.id_for_label }}" class="form__label">Téléphone <span
+                            class="form__required">*</span></label>
+                    {{ form.phone }}
+                    {% if form.phone.errors %}
+                        <div class="form__errors">
+                            {% for e in form.phone.errors %}<p>{{ e }}</p>{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form__row span-full">
+                    <label for="{{ form.message.id_for_label }}" class="form__label">Message <span
+                            class="form__required">*</span></label>
+                    {{ form.message }}
+                    {% if form.message.errors %}
+                        <div class="form__errors">
+                            {% for e in form.message.errors %}<p>{{ e }}</p>{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="contactForm__actions">
+                <button type="submit" class="btn btn--primary">Envoyer</button>
+                <a href="/" class="btn btn--ghost">Annuler</a>
+            </div>
+        </form>
+    </section>
+{% endblock %}

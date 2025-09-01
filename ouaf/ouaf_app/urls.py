@@ -1,17 +1,22 @@
 from django.urls import path, include
 from . import views
 
+
 urlpatterns = [
     path("", views.index, name='index'),
     path('account/logout', views.my_logout, name="my_logout"),
     path("account/", include("django.contrib.auth.urls")),
     path("registration/signup",views.signup_user, name="signup"),
     path("account/edit", views.account_edit, name="account_edit"),
+
     path("organisationChart", views.organisation_chart, name="organisation_chart"),
+
     path("mediationAnimale", views.mediation_animale, name="mediation_animale"),
+
     path("activities/", views.ActivityCategoryListView.as_view(), name="activities_list"),
     path("activities/category/<int:pk>/", views.ActivitiesByCategoryView.as_view(), name="activities_by_category"),
 
+    path("contact/", views.ContactView.as_view(), name="contact"),
 
     path("confidentialite", views.confidentialite, name="confidentialite")
     #account/login/ [name='login']

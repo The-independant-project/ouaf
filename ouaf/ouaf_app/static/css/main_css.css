@@ -1085,6 +1085,140 @@ body.no-scroll {
 }
 
 
+/* ===========================
+   CONTACT – page & formulaire
+   =========================== */
+
+.contact {
+  max-width: var(--max-w);
+  margin-inline: auto;
+  padding: var(--space-8) var(--space-4);
+}
+
+.contact__header {
+  text-align: center;
+  margin-bottom: var(--space-8);
+}
+.contact__header h1 {
+  font-size: clamp(1.8rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: var(--clr-ink);
+  margin: 0;
+}
+.contact__intro {
+  color: var(--clr-muted);
+  margin-top: var(--space-2);
+}
+
+/* Messages (framework messages) */
+.contact__messages {
+  max-width: 860px;
+  margin: 0 auto var(--space-6);
+}
+.contact__message {
+  margin: 0 0 var(--space-2);
+  padding: .75rem 1rem;
+  border-radius: calc(var(--radius) - 4px);
+  border: 1px solid var(--clr-primary-dark);
+  background: #fff;
+  color: var(--clr-ink);
+}
+.contact__message.success {
+  border-color: #4caf50;
+  background: #f0fff2;
+}
+
+/* Formulaire */
+.contactForm {
+  max-width: 860px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid var(--clr-primary-dark);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 24px rgba(0,0,0,.05);
+  overflow: hidden;
+  padding: 1.25rem;
+}
+
+/* Grille responsive */
+.contactForm__grid {
+  display: grid;
+  gap: var(--space-4);
+}
+@media (min-width: 720px){
+  .contactForm__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .contactForm__grid .span-full {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Champs */
+.form__row {
+  display: grid;
+  gap: .4rem;
+}
+.form__label {
+  font-weight: 600;
+  color: var(--clr-ink);
+}
+.form__required {
+  color: #c62828;
+  margin-left: .25rem;
+}
+
+.contactForm input[type="text"],
+.contactForm input[type="email"],
+.contactForm textarea {
+  padding: .6rem .7rem;
+  border: 1px solid var(--clr-primary-dark);
+  border-radius: calc(var(--radius) - 4px);
+  background: #fff;
+  color: var(--clr-ink);
+  font: inherit;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.contactForm textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.contactForm input:focus,
+.contactForm textarea:focus {
+  outline: none;
+  border-color: var(--clr-accent);
+  box-shadow: 0 0 0 3px rgba(47,111,118,.15);
+}
+
+/* Aide & erreurs */
+.form__help {
+  color: var(--clr-muted);
+  font-size: .9rem;
+  margin: 0;
+}
+.form__errors {
+  color: #b00020;
+  font-size: .9rem;
+}
+.contactForm__nonfield {
+  margin: 0 0 1rem;
+  padding: .75rem 1rem;
+  border-radius: calc(var(--radius) - 4px);
+  border: 1px solid #b00020;
+  background: #fff5f6;
+  color: #b00020;
+}
+
+/* Actions */
+.contactForm__actions {
+  margin-top: var(--space-6);
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
 
 
 

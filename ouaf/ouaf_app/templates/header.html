@@ -34,6 +34,10 @@
         <li class="header__item">
           <a class="header__link {% if request.resolver_match.url_name == 'activites_list' %}is-active{% endif %}" href="{% url 'activities_list' %}">Activités</a>
         </li>
+          <li class="header__item">
+              <a class="header__link {% if request.resolver_match.url_name == 'contact' %}is-active{% endif %}"
+                 href="{% url 'contact' %}">Contact</a>
+          </li>
       </ul>
 
       <div class="header__user">
