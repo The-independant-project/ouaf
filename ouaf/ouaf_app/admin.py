@@ -56,14 +56,6 @@ class MemberPaymentAdmin(admin.ModelAdmin):
     autocomplete_fields = ("personId",)
 
 
-@admin.register(Animal)
-class AnimalAdmin(admin.ModelAdmin):
-    list_display = ("name", "birth", "death", "pet_amount")
-    list_filter = ("birth", "death")
-    search_fields = ("name",)
-    date_hierarchy = "birth"
-
-
 # @admin.register(OrganisationChartEntry)
 # class OrganisationChartEntryAdmin(admin.ModelAdmin):
 #     list_display = ("personId", "text")
@@ -73,3 +65,5 @@ class AnimalAdmin(admin.ModelAdmin):
 admin.site.register(OrganisationChartEntry)
 admin.site.register(Activity)
 admin.site.register(ActivityCategory)
+admin.site.register(Animal)
+admin.site.register(AnimalMedia)

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Edition de l'animal {{animal.name}}</h1>
+    <form method="post" action="{% url 'backoffice:animal_edit' animal.id %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if form.errors %}
+            {{form.errors}}
+        {% endif %}
+        {{ form }}
+        <input type="submit" value="Confirmer">
+        <input type="hidden" name="next" value="{{ next }}">
+    </form>
+
+<a href="{% url 'backoffice:animal_delete' animal.id%}">Supprimer l'animal</a>
+{% endblock %}

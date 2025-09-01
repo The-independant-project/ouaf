@@ -10,7 +10,8 @@ urlpatterns = [
     path("organisationChart", views.organisation_chart, name="organisation_chart"),
     path("mediationAnimale", views.mediation_animale, name="mediation_animale"),
     path("activities/list", views.ActivityListView.as_view(), name="activites_list"),
-
+    path("animals/list", views.animal_list, name="animals_list"),
+    path("animals/<int:animal_id>/detail/", views.animal_detail, name="animal_detail"),
     path("confidentialite", views.confidentialite, name="confidentialite")
     #account/login/ [name='login']
     #account/logout/ [name='logout']

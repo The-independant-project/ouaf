@@ -1,10 +1,11 @@
+from django.db.models import Prefetch
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import login_required, login_not_required
 from django.views.generic import ListView
 from django.http import HttpRequest
 from .forms import PersonForm, RegistrationForm
-from .models import OrganisationChartEntry, Activity
+from .models import OrganisationChartEntry, Activity, Animal, AnimalMedia
 
 
 # Create your views here.
@@ -68,3 +69,16 @@ class ActivityListView(ListView):
     model = Activity
     template_name = "activities/list.html"
     raise_exception = True
+
+def animal_list(request):
+    animals = Animal.objects.prefetch_related(Prefetch("media", to_attr="medias")).all()
+    for animal in animals:
+        if animal.medias:
+            pres_image = next(media for media in animal.medias if media.is_image)
+            if pres_image:
+                animal.presentation_image = pres_image.file
+    return render(request, "animals/list.html", { "animals": animals })
+def animal_detail(request, animal_id):
+    animal = Animal.objects.filter(id=animal_id).first()
+    medias = AnimalMedia.objects.filter(animal_id=animal_id)
+    return render(request, "animals/detail.html", { "animal": animal, "medias": medias })

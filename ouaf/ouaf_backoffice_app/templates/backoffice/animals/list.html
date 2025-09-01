@@ -1,4 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
+<h1>Liste des animaux</h1>
+<ul>
+{% for animal in animal_list %}
+    <li><span> <a href="{% url 'backoffice:animal_edit' animal.id %}">{{ animal.name }}</a></span></li>
+{% endfor %}
+</ul>
+<a href="{% url 'backoffice:animal_create'%}">Ajouter un nouvel animal</a>
+
 {% endblock %}

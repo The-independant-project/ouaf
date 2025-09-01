@@ -93,7 +93,26 @@ class AnimalListView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, Lis
     template_name = "backoffice/animals/list.html"
     permission_required = animal_view.perm_name()
     raise_exception = True
-
+class AnimalCreateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, CreateView):
+    model = Animal
+    fields = ["name", "description", "birth", "death", "pet_amount"]
+    template_name = "backoffice/animals/form.html"
+    permission_required = animal_add.perm_name()
+    success_url = reverse_lazy('backoffice:animal_list')
+    raise_exception = True
+class AnimalEditView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, UpdateView):
+    model = Animal
+    fields = ["name", "description", "birth", "death", "pet_amount"]
+    template_name = "backoffice/animals/update.html"
+    permission_required = animal_change.perm_name()
+    success_url = reverse_lazy('backoffice:animal_list')
+    raise_exception = True
+class AnimalDeleteView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, DeleteView):
+    model = Animal
+    template_name = "backoffice/animals/confirm_delete.html"
+    permission_required = animal_delete.perm_name()
+    success_url = reverse_lazy('backoffice:animal_list')
+    raise_exception = True
 
 class ActivityListView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, ListView):
     model = Activity
