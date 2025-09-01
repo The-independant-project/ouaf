@@ -20,7 +20,6 @@ from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.static import serve
-from debug_toolbar.toolbar import debug_toolbar_urls
 
 
 urlpatterns = [
@@ -28,11 +27,12 @@ urlpatterns = [
     path("", include('ouaf_app.urls')),
     path("backoffice/", include('ouaf_backoffice_app.urls')),
     path("index/", RedirectView.as_view(url="/", permanent=True)),
-] + debug_toolbar_urls()
+]
 
 if settings.DEBUG:
+    from debug_toolbar.toolbar import debug_toolbar_urls
     # Dev
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + debug_toolbar_urls()
 else:
     # Prod sans Nginx/Apache
     urlpatterns += [
