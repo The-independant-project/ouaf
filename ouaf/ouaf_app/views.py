@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required, login_not_required
 from django.views.generic import ListView
 from django.http import HttpRequest
 from .forms import PersonForm, RegistrationForm
-from .models import OrganisationChartEntry, Activity
+from .models import OrganisationChartEntry, Activity, ActivityCategory
 
 
 # Create your views here.
@@ -64,7 +64,21 @@ def confidentialite(request):
     return render(request, "confidentialite.html")
 
 
-class ActivityListView(ListView):
-    model = Activity
+class ActivityCategoryListView(ListView):
+    model = ActivityCategory
     template_name = "activities/list.html"
-    raise_exception = True
+    context_object_name = "categories"
+
+
+class ActivitiesByCategoryView(ListView):
+    model = Activity
+    template_name = "activities/by_category.html"
+    context_object_name = "activities"
+
+    def get_queryset(self):
+        return Activity.objects.filter(category_id=self.kwargs["pk"]).order_by("title")
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["category"] = ActivityCategory.objects.get(pk=self.kwargs["pk"])
+        return ctx
