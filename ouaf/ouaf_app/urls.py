@@ -1,6 +1,6 @@
 from django.urls import path, include
 from . import views
-from .views import ContactView
+
 
 urlpatterns = [
     path("", views.index, name='index'),
@@ -16,7 +16,7 @@ urlpatterns = [
     path("activities/", views.ActivityCategoryListView.as_view(), name="activities_list"),
     path("activities/category/<int:pk>/", views.ActivitiesByCategoryView.as_view(), name="activities_by_category"),
 
-    path("contact/", ContactView.as_view(), name="contact"),
+    path("contact/", views.ContactView.as_view(), name="contact"),
 
     path("confidentialite", views.confidentialite, name="confidentialite")
     #account/login/ [name='login']
