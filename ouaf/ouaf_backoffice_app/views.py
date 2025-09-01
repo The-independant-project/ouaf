@@ -8,7 +8,8 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, ListView, DeleteView, UpdateView, CreateView, DetailView
 from .mixins import BackofficeAccessRequiredMixin
-from ouaf_app.models import Event, Animal, Activity, OrganisationChartEntry, ActivityMedia, ActivityCategory
+from ouaf_app.models import Event, Animal, Activity, OrganisationChartEntry, ActivityMedia, ActivityCategory, \
+    AnimalMedia
 from .forms import PersonEditForm
 from ouaf_app.signals import *
 from django.db import transaction
@@ -100,6 +101,51 @@ class AnimalCreateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, C
     permission_required = animal_add.perm_name()
     success_url = reverse_lazy('backoffice:animal_list')
     raise_exception = True
+
+    def _create_formset_class(self):
+        return inlineformset_factory(
+            Animal,
+            AnimalMedia,
+            fields=["file", "url", "caption", "position"],
+            extra=2,
+            can_delete=True,
+        )
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        FormSet = self._create_formset_class()
+        if self.request.method == "POST":
+            ctx["media_formset"] = FormSet(self.request.POST, self.request.FILES)
+        else:
+            ctx["media_formset"] = FormSet()
+        return ctx
+
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        form = self.get_form()
+        FormSet = self._create_formset_class()
+        media_formset = FormSet(request.POST, request.FILES)
+
+        print("post")
+        print(form.is_valid())
+        print(media_formset.is_valid())
+        if form.is_valid() and media_formset.is_valid():
+            print("valid")
+            with transaction.atomic():
+                self.object = form.save()
+                media_formset.instance = self.object
+                media_formset.save()
+
+            messages.success(request, "Animal créé.")
+            return redirect(self.get_success_url())
+        else:
+            print(media_formset.error_messages)
+            print("invalid")
+
+        context = self.get_context_data(form=form)
+        return self.render_to_response(context)
+
+
 class AnimalEditView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Animal
     fields = ["name", "description", "birth", "death", "pet_amount"]
@@ -107,6 +153,50 @@ class AnimalEditView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, Upd
     permission_required = animal_change.perm_name()
     success_url = reverse_lazy('backoffice:animal_list')
     raise_exception = True
+
+    def _update_formset_class(self):
+        return inlineformset_factory(
+            Animal,
+            AnimalMedia,
+            fields=["file", "url", "caption", "position"],
+            extra=0,
+            can_delete=True
+        )
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        UpdateFormSet = self._update_formset_class()
+        if self.request.method == "POST":
+            ctx["media_formset"] = UpdateFormSet(self.request.POST, self.request.FILES, instance=self.object)
+        else:
+            ctx["media_formset"] = UpdateFormSet(instance=self.object)
+        return ctx
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        UpdateFormSet = self._update_formset_class()
+        media_formset = UpdateFormSet(request.POST, request.FILES, instance=self.object)
+
+        print("update")
+        print(form.is_valid())
+        print(media_formset.is_valid())
+        if form.is_valid() and media_formset.is_valid():
+            with transaction.atomic():
+                self.object = form.save()
+                media_formset.save()
+            messages.success(request, "Animal mis à jour.")
+            return redirect(self.get_success_url())
+        else:
+            print(media_formset.error_messages)
+            print("invalid")
+
+        return self.render_to_response({
+            "form": form,
+            "animal": self.object,
+            "media_formset": media_formset,
+        })
+
 class AnimalDeleteView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Animal
     template_name = "backoffice/animals/confirm_delete.html"

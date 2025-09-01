@@ -2,15 +2,102 @@
 
 {% block content %}
 <h1>Edition de l'animal {{animal.name}}</h1>
-    <form method="post" action="{% url 'backoffice:animal_edit' animal.id %}" enctype="multipart/form-data">
-        {% csrf_token %}
-        {% if form.errors %}
-            {{form.errors}}
-        {% endif %}
-        {{ form }}
-        <input type="submit" value="Confirmer">
-        <input type="hidden" name="next" value="{{ next }}">
-    </form>
+<form method="post" action="{% url 'backoffice:animal_edit' animal.id %}" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% if form.errors %}
+    {{form.errors}}
+    {% endif %}
+
+    {{ form }}
+
+    {% if formset.errors %}
+    {{formset.errors}}
+    {% endif %}
+
+    {{ media_formset.management_form }}
+
+    <div id="media-forms" class="formGrid">
+        {% for mf in media_formset %}
+        {% for hidden in mf.hidden_fields %}
+        {{ hidden }}
+        {% endfor %}
+        <div class="form__row span-full">
+            <p class="form__label" style="margin-top:0;"><strong>Média #{{ forloop.counter }}</strong></p>
+
+            <div class="formGrid">
+                <div class="form__row">
+                    <label class="form__label" for="{{ mf.file.id_for_label }}">Fichier</label>
+                    {{ mf.file }}
+                </div>
+
+                <div class="form__row">
+                    <label class="form__label" for="{{ mf.url.id_for_label }}">URL</label>
+                    {{ mf.url }}
+                    <p class="form__help">Image/vidéo distante ou URL YouTube. Laissez vide si vous uploadez un
+                        fichier.</p>
+                </div>
+
+                <div class="form__row">
+                    <label class="form__label" for="{{ mf.caption.id_for_label }}">Légende</label>
+                    {{ mf.caption }}
+                </div>
+
+                <div class="form__row">
+                    <label class="form__label" for="{{ mf.position.id_for_label }}">Position</label>
+                    {{ mf.position }}
+                </div>
+
+                {% if mf.DELETE %}
+                <div class="form__row">
+                    <label class="form__label" for="{{ mf.DELETE.id_for_label }}">Supprimer</label>
+                    {{ mf.DELETE }}
+                </div>
+                {% endif %}
+            </div>
+
+            {# erreurs par champ #}
+            {% for field in mf.visible_fields %}
+            {% if field.errors %}
+            <div class="form__errors">{{ field.errors }}</div>
+            {% endif %}
+            {% endfor %}
+            {# erreurs non-liées #}
+            {% if mf.non_field_errors %}
+            <div class="form__errors">{{ mf.non_field_errors }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div>
+        <input type="button" value="Add More" id="add-media">
+    </div>
+    /* --- Ajout dynamique d’un média (inline formset) --- */
+
+    <div id="empty_form" style="display:none">
+        {{ media_formset.empty_form }}
+    </div>
+    <script>
+        const add_more_button = document.getElementById('add-media');
+        const id_media_total_forms = document.getElementById('id_media-TOTAL_FORMS');
+        const forms_list = document.getElementById('media-forms');
+        const empty_form = document.getElementById('empty_form');
+
+        add_more_button?.addEventListener("click", () => {
+            var form_idx = id_media_total_forms.value;
+            var new_div = document.createElement('div');
+            new_div.outerHTML = empty_form.outerHTML;
+            new_div.innerHTML = empty_form.innerHTML.replace(/__prefix__/g, form_idx);
+            forms_list.appendChild(new_div);
+            id_media_total_forms.value = parseInt(form_idx) + 1;
+        });
+    </script>
+
+    <input type="submit" value="Confirmer">
+    <input type="hidden" name="next" value="{{ next }}">
+</form>
 
 <a href="{% url 'backoffice:animal_delete' animal.id%}">Supprimer l'animal</a>
+<a href="{% url 'backoffice:animal_list' %}">Annuler</a>
 {% endblock %}
