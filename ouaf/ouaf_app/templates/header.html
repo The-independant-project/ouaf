@@ -4,79 +4,89 @@
 <a class="skiplink" href="#main">Aller au contenu</a>
 
 <header class="header" role="banner">
-  <div class="header__inner">
-    <!-- Brand / Logo -->
-    <div class="header__brand">
-      <a href="{% url 'index' %}" class="header__logo" aria-label="Aller à l'accueil">
-        <img src="{% static 'images/logo_vectorise.svg' %}" alt="Logo Les Sourires d'Hindi" class="header__logoImg">
-        <span class="header__brandName">Les Sourires d’Hindi</span>
-      </a>
+    <div class="header__inner">
+        <!-- Brand / Logo -->
+        <div class="header__brand">
+            <a href="{% url 'index' %}" class="header__logo" aria-label="Aller à l'accueil">
+                <img src="{% static 'images/logo_vectorise.svg' %}" alt="Logo Les Sourires d'Hindi"
+                     class="header__logoImg">
+                <span class="header__brandName">Les Sourires d’Hindi</span>
+            </a>
+        </div>
+
+        <!-- Mobile toggle -->
+        <button class="header__toggle" aria-expanded="false" aria-controls="site-nav">
+            <span class="header__toggleIcon" aria-hidden="true"></span>
+            <span class="sr-only"></span>
+        </button>
+
+        <!-- Primary navigation -->
+        <nav id="site-nav" class="header__nav" aria-label="Navigation principale">
+            <ul class="header__list">
+                <li class="header__item">
+                    <a class="header__link {% if request.resolver_match.url_name == 'index' %}is-active{% endif %}"
+                       href="{% url 'index' %}">Accueil</a>
+                </li>
+                <li class="header__item">
+                    <a class="header__link {% if request.resolver_match.url_name == 'organisation_chart' %}is-active{% endif %}"
+                       href="{% url 'organisation_chart' %}">Trombinoscope</a>
+                </li>
+                <li class="header__item">
+                    <a class="header__link {% if request.resolver_match.url_name == 'mediation_animale' %}is-active{% endif %}"
+                       href="{% url 'mediation_animale' %}">Médiation animale</a>
+                </li>
+                <li class="header__item">
+                    <a class="header__link {% if request.resolver_match.url_name == 'activites_list' %}is-active{% endif %}"
+                       href="{% url 'activities_list' %}">Activités</a>
+                </li>
+                <li class="header__item">
+                    <a class="header__link {% if request.resolver_match.url_name == 'animals_list' %}is-active{% endif %}"
+                       href="{% url 'animals_list' %}">Animaux</a>
+                </li>
+                <li class="header__item">
+                    <a class="header__link {% if request.resolver_match.url_name == 'contact' %}is-active{% endif %}"
+                       href="{% url 'contact' %}">Contact</a>
+                </li>
+            </ul>
+
+            <div class="header__user">
+                {% if user.is_authenticated %}
+                <span class="header__greet">Hi {{ user.username }} !</span>
+
+                <!-- Desktop -->
+                <div class="header__userLinks">
+                    <a class="header__userLink" href="{% url 'account_edit' %}">Mon compte</a>
+                    <a class="header__userLink" href="{% url 'my_logout' %}">Déconnexion</a>
+                    {% if perms.ouaf_app.view_event %}
+                    <a class="header__userLink" href="{% url 'backoffice:home' %}">Backoffice</a>
+                    {% endif %}
+                </div>
+
+                <!-- Mobile -->
+                <ul class="header__userList">
+                    <li><a class="header__userLink" href="{% url 'account_edit' %}">Mon compte</a></li>
+                    <li><a class="header__userLink" href="{% url 'my_logout' %}">Déconnexion</a></li>
+                    {% if perms.ouaf_app.view_event %}
+                    <li><a class="header__userLink" href="{% url 'backoffice:home' %}">Backoffice</a></li>
+                    {% endif %}
+                </ul>
+
+                {% else %}
+                <p class="header__anonNote">Vous n'êtes pas connecté(e)</p>
+
+                <!-- Desktop -->
+                <div class="header__userLinks">
+                    <a class="header__userLink" href="{% url 'signup' %}">S'inscrire</a>
+                    <a class="header__userLink" href="{% url 'login' %}">Connexion</a>
+                </div>
+
+                <!-- Mobile -->
+                <ul class="header__userList">
+                    <li><a class="header__userLink" href="{% url 'signup' %}">S'inscrire</a></li>
+                    <li><a class="header__userLink" href="{% url 'login' %}">Connexion</a></li>
+                </ul>
+                {% endif %}
+            </div>
+        </nav>
     </div>
-
-    <!-- Mobile toggle -->
-    <button class="header__toggle" aria-expanded="false" aria-controls="site-nav">
-      <span class="header__toggleIcon" aria-hidden="true"></span>
-      <span class="sr-only"></span>
-    </button>
-
-    <!-- Primary navigation -->
-    <nav id="site-nav" class="header__nav" aria-label="Navigation principale">
-      <ul class="header__list">
-        <li class="header__item">
-          <a class="header__link {% if request.resolver_match.url_name == 'index' %}is-active{% endif %}" href="{% url 'index' %}">Accueil</a>
-        </li>
-        <li class="header__item">
-          <a class="header__link {% if request.resolver_match.url_name == 'organisation_chart' %}is-active{% endif %}" href="{% url 'organisation_chart' %}">Trombinoscope</a>
-        </li>
-        <li class="header__item">
-          <a class="header__link {% if request.resolver_match.url_name == 'mediation_animale' %}is-active{% endif %}" href="{% url 'mediation_animale' %}">Médiation animale</a>
-        </li>
-        <li class="header__item">
-          <a class="header__link {% if request.resolver_match.url_name == 'activites_list' %}is-active{% endif %}" href="{% url 'activites_list' %}">Activités</a>
-        </li>
-        <li class="header__item">
-          <a class="header__link {% if request.resolver_match.url_name == 'animals_list' %}is-active{% endif %}" href="{% url 'animals_list' %}">Animaux</a>
-        </li>
-      </ul>
-
-      <div class="header__user">
-        {% if user.is_authenticated %}
-          <span class="header__greet">Hi {{ user.username }} !</span>
-
-          <!-- Desktop -->
-          <div class="header__userLinks">
-            <a class="header__userLink" href="{% url 'account_edit' %}">Mon compte</a>
-            <a class="header__userLink" href="{% url 'my_logout' %}">Déconnexion</a>
-              {% if perms.ouaf_app.view_event %}
-            <a class="header__userLink" href="{% url 'backoffice:home' %}">Backoffice</a>
-              {% endif %}
-          </div>
-
-          <!-- Mobile -->
-          <ul class="header__userList">
-            <li><a class="header__userLink" href="{% url 'account_edit' %}">Mon compte</a></li>
-            <li><a class="header__userLink" href="{% url 'my_logout' %}">Déconnexion</a></li>
-              {% if perms.ouaf_app.view_event %}
-            <li><a class="header__userLink" href="{% url 'backoffice:home' %}">Backoffice</a></li>
-              {% endif %}
-          </ul>
-
-        {% else %}
-          <p class="header__anonNote">Vous n'êtes pas connecté(e)</p>
-
-          <!-- Desktop -->
-          <div class="header__userLinks">
-            <a class="header__userLink" href="{% url 'signup' %}">S'inscrire</a>
-            <a class="header__userLink" href="{% url 'login' %}">Connexion</a>
-          </div>
-
-          <!-- Mobile -->
-          <ul class="header__userList">
-            <li><a class="header__userLink" href="{% url 'signup' %}">S'inscrire</a></li>
-            <li><a class="header__userLink" href="{% url 'login' %}">Connexion</a></li>
-          </ul>
-        {% endif %}
-      </div>
-    </nav>
-  </div>
 </header>

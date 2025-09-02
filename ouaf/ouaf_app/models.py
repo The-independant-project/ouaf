@@ -135,3 +135,5 @@ class AnimalMedia(AbstractMedia):
 
 
         return f"{self.animal.name} - {super().__str__()}"
+    class Meta:
+        ordering = ["position", "id"]

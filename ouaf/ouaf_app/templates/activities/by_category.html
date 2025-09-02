@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block subtitle %} – Activités{% endblock %}
+
+{% block content %}
+    <section class="activities" aria-labelledby="activities-title">
+        <header class="activities__header">
+            <h1 id="activities-title">Activités – {{ category.title }}</h1>
+            <p class="activities__intro">Découvrez les activités de la catégorie « {{ category.title }} ».</p>
+        </header>
+
+        <ul class="activities__rows" role="list">
+            {# On s’appuie sur Meta.ordering (position, id) défini sur ActivityMedia. #}
+            {% for a in activities %}
+                {% with media_list=a.media.all %}
+                    {% with primary=media_list|first others=media_list|slice:"1:" %}
+                        <li class="activities__row {% if not forloop.counter0|divisibleby:2 %}is-reverse{% endif %}">
+                            <!-- Média principal (colonne 1 ou 2 selon alternance) -->
+                            <figure class="activities__media">
+                                {% if primary %}
+                                    {% if primary.is_image %}
+                                        <img
+                                                src="{{ primary.file.url|default:primary.url }}"
+                                                alt="{{ primary.caption|default:a.title }}"
+                                                loading="lazy" decoding="async">
+                                    {% elif primary.is_video %}
+                                        {% if "youtu" in primary.url %}
+                                            <!-- Wrapper ratio 16/9 pour YouTube -->
+                                            <div class="js-yt-embed" data-yt="{{ primary.url }}"></div>
+                                        {% else %}
+                                            <video src="{{ primary.file.url|default:primary.url }}" controls playsinline
+                                                   preload="metadata"></video>
+                                        {% endif %}
+                                    {% else %}
+                                        <div class="activities__mediaFallback">
+                                            <a class="activities__ytLink"
+                                               href="{{ primary.file.url|default:primary.url }}" target="_blank"
+                                               rel="noopener">
+                                                Ouvrir le média
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                {% else %}
+                                    <div class="activities__mediaFallback">
+                                        <img src="{% static 'images/avatar_placeholder.svg' %}" alt="Média indisponible"
+                                             style="max-width:240px;">
+                                    </div>
+                                {% endif %}
+                            </figure>
+
+                            <!-- Titre + description (colonne opposée) -->
+                            <div class="activities__content">
+                                <h2 class="activities__title">{{ a.title }}</h2>
+                                <p class="activities__desc">{{ a.description }}</p>
+                            </div>
+
+                            <!-- Carrousel (pleine largeur, SOUS les 2 colonnes) -->
+                            {% if others %}
+                                <div class="activities__carousel">
+                                    <div class="mediaCarousel">
+                                        <div class="owl-carousel owl-theme js-owl">
+                                            {% for m in others %}
+                                                {# --- SLIDE IMAGE --- #}
+                                                {% if m.is_image %}
+                                                    <div class="item mediaCarousel__slide">
+                                                        <img src="{{ m.file.url|default:m.url }}"
+                                                             alt="{{ m.caption|default:a.title }}">
+                                                    </div>
+
+                                                    {# --- SLIDE VIDEO (YouTube gérée maison) --- #}
+                                                {% elif m.is_video and "youtu" in m.url %}
+                                                    <div class="item mediaCarousel__slide">
+                                                        <button class="yt-thumb js-yt-thumb"
+                                                                type="button"
+                                                                data-yt="{{ m.url }}"
+                                                                aria-label="Lire la vidéo YouTube">
+                                                        </button>
+                                                    </div>
+
+                                                    {# --- SLIDE VIDEO FICHIER --- #}
+                                                {% elif m.is_video %}
+                                                    <div class="item mediaCarousel__slide">
+                                                        <video src="{{ m.file.url|default:m.url }}" controls playsinline
+                                                               preload="metadata"></video>
+                                                    </div>
+
+                                                    {# --- SLIDE LIEN AUTRE --- #}
+                                                {% else %}
+                                                    <div class="item mediaCarousel__slide">
+                                                        <a class="mediaCarousel__link"
+                                                           href="{{ m.file.url|default:m.url }}" target="_blank"
+                                                           rel="noopener">
+                                                            Ouvrir le média
+                                                        </a>
+                                                    </div>
+                                                {% endif %}
+
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </li>
+                    {% endwith %}
+                {% endwith %}
+            {% empty %}
+                <li>Aucune activité dans cette catégorie pour le moment.</li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.js-yt-embed').forEach(el => {
+                const url = el.getAttribute('data-yt') || '';
+
+                function ytId(u) {
+                    try {
+                        const a = document.createElement('a');
+                        a.href = u;
+                        if (a.hostname.includes('youtu.be')) return a.pathname.slice(1);
+                        const p = new URLSearchParams(a.search);
+                        if (p.get('v')) return p.get('v');
+                        const parts = a.pathname.split('/');
+                        const i = parts.indexOf('embed');
+                        if (i >= 0 && parts[i + 1]) return parts[i + 1];
+                    } catch (e) {
+                    }
+                    return null;
+                }
+
+                const id = ytId(url);
+                if (!id) {
+                    el.innerHTML = '<a class="activities__ytLink" href="' + url + '" target="_blank" rel="noopener">Voir la vidéo sur YouTube</a>';
+                    return;
+                }
+
+                const iframe = document.createElement('iframe');
+                iframe.src = 'https://www.youtube.com/embed/' + id + '?rel=0';
+                iframe.title = 'YouTube video';
+                iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+                iframe.allowFullscreen = true;
+                el.replaceChildren(iframe);
+            });
+        });
+
+
+        (function bootOwl() {
+            if (!window.jQuery) return setTimeout(bootOwl, 120);
+            if (!jQuery.fn || !jQuery.fn.owlCarousel) return setTimeout(bootOwl, 120);
+
+            jQuery(function ($) {
+                $('.js-owl').each(function () {
+                    const $owl = $(this);
+                    if (!$owl.children().length) return;
+
+                    $owl.owlCarousel({
+                        items: 3,
+                        margin: 16,
+                        nav: true,
+                        dots: true,
+                        loop: false,
+                        autoHeight: false,
+                        stagePadding: 8,
+                        responsive: {
+                            0: {items: 1, stagePadding: 0, margin: 12},
+                            600: {items: 2},
+                            1024: {items: 3}
+                        },
+                        onInitialized: () => setTimeout(() => $owl.trigger('refresh.owl.carousel'), 200)
+                    });
+
+
+                    $owl.find('img').each(function () {
+                        if (this.complete) return;
+                        $(this).on('load', () => $owl.trigger('refresh.owl.carousel'));
+                    });
+
+                    $owl.on('loaded.owl.lazy', () => $owl.trigger('refresh.owl.carousel'));
+                    setTimeout(() => $owl.trigger('refresh.owl.carousel'), 250);
+                });
+            });
+        })();
+
+        function ytIdFromUrl(u) {
+            try {
+                const a = document.createElement('a');
+                a.href = u;
+                if (a.hostname.includes('youtu.be')) return a.pathname.slice(1);
+                const p = new URLSearchParams(a.search);
+                if (p.get('v')) return p.get('v');
+                const parts = a.pathname.split('/');
+                const i = parts.indexOf('embed');
+                if (i >= 0 && parts[i + 1]) return parts[i + 1];
+            } catch (e) {
+            }
+            return null;
+        }
+
+        // Pose les miniatures au DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.js-yt-thumb').forEach(btn => {
+                const id = ytIdFromUrl(btn.dataset.yt || '');
+                if (!id) {
+                    btn.outerHTML = '<span>Vidéo indisponible</span>';
+                    return;
+                }
+                btn.style.setProperty('--yt-thumb', `url(https://img.youtube.com/vi/${id}/hqdefault.jpg)`);
+                // click -> remplace par iframe (pas de gestion “unique”, on autorise plusieurs players)
+                btn.addEventListener('click', () => {
+                    const iframe = document.createElement('iframe');
+                    iframe.src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
+                    iframe.title = 'YouTube video';
+                    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+                    iframe.allowFullscreen = true;
+                    iframe.style.width = '100%';
+                    iframe.style.height = '100%';
+                    // wrapper pour garder le ratio du slide
+                    const wrap = document.createElement('div');
+                    wrap.className = 'yt-iframe-wrap';
+                    wrap.appendChild(iframe);
+                    btn.replaceWith(wrap);
+                }, {once: true});
+            });
+        });
+    </script>
+{% endblock %}
