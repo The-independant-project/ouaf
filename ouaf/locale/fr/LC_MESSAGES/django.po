@@ -107,8 +107,8 @@ msgid "Date de décès"
 msgstr "Date de décès"
 
 #: ouaf_app/models.py:89
-msgid "Nombre d’animaux"
-msgstr "Nombre d’animaux"
+msgid "Nombre de caresses"
+msgstr "Nombre de caresses"
 
 #: ouaf_app/models.py:93 ouaf_backoffice_app/forms.py:9
 msgid "Prénom"
