@@ -36,8 +36,5 @@ class PersonEditForm(forms.ModelForm):
         return super().save(*args, **kwargs)
 
 
-class AnimalMediaForm(forms.ModelForm):
-    template_name = "backoffice/animals/baseForm.html"
-    class Meta:
-        model = Animal
-        fields = ["name", "description", "birth", "death", "pet_amount"]
+class MediaForm(forms.ModelForm):
+    template_name = "backoffice/forms/media.html"

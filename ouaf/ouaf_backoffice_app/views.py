@@ -10,7 +10,7 @@ from django.views.generic import TemplateView, ListView, DeleteView, UpdateView,
 from .mixins import BackofficeAccessRequiredMixin
 from ouaf_app.models import Event, Animal, Activity, OrganisationChartEntry, ActivityMedia, ActivityCategory, \
     AnimalMedia
-from .forms import PersonEditForm, AnimalMediaForm
+from .forms import PersonEditForm, MediaForm
 from ouaf_app.signals import *
 from django.db import transaction
 
@@ -109,7 +109,7 @@ class AnimalCreateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, C
         return inlineformset_factory(
             Animal,
             AnimalMedia,
-            form=AnimalMediaForm,
+            form=MediaForm,
             fields=["file", "url", "caption", "position"],
             extra=1,
             can_delete=True,
@@ -162,7 +162,7 @@ class AnimalEditView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, Upd
         return inlineformset_factory(
             Animal,
             AnimalMedia,
-            form=AnimalMediaForm,
+            form=MediaForm,
             fields=["file", "url", "caption", "position"],
             extra=0,
             can_delete=True
