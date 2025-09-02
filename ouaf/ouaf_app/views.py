@@ -7,6 +7,7 @@ from django.http import HttpRequest
 from .forms import PersonForm, RegistrationForm, ContactForm
 from .models import OrganisationChartEntry, Activity, ActivityCategory
 from django.contrib import messages
+from django.utils.translation import gettext as _
 
 
 
