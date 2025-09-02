@@ -68,11 +68,11 @@ class MemberPayment(models.Model):
 
 
 class Animal(models.Model):
-    name = models.CharField(max_length=100)
-    birth = models.DateTimeField()
-    death = models.DateTimeField()
+    name = models.CharField(max_length=100, null=True)
+    description = models.CharField(max_length=1000, null=True)
+    birth = models.DateTimeField(null=True, blank=True)
+    death = models.DateTimeField(null=True, blank=True)
     pet_amount = models.IntegerField()
-
 
 class OrganisationChartEntry(models.Model):
     first_name = models.CharField(max_length=1000)
@@ -128,5 +128,12 @@ class ActivityMedia(AbstractMedia):
     activity = models.ForeignKey(Activity, on_delete=models.CASCADE, related_name="media")
     file = models.FileField(upload_to='activities/media', blank=True)
 
+class AnimalMedia(AbstractMedia):
+    animal = models.ForeignKey(Animal, null=False, blank=False, on_delete=models.CASCADE, related_name='media')
+    file = models.FileField(upload_to="animals/media", null=False, blank=False)
+    def __str__(self):
+
+
+        return f"{self.animal.name} - {super().__str__()}"
     class Meta:
         ordering = ["position", "id"]

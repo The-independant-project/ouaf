@@ -16,6 +16,8 @@ urlpatterns = [
     path("activities/", views.ActivityCategoryListView.as_view(), name="activities_list"),
     path("activities/category/<int:pk>/", views.ActivitiesByCategoryView.as_view(), name="activities_by_category"),
 
+    path("animals/list", views.animal_list, name="animals_list"),
+    path("animals/<int:animal_id>/detail/", views.animal_detail, name="animal_detail"),
     path("contact/", views.ContactView.as_view(), name="contact"),
 
     path("confidentialite", views.confidentialite, name="confidentialite")

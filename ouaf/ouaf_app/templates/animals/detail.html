@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block subtitle %} - {{animal.name}}{% endblock %}
+
+{% block content %}
+<h1>{{animal.name}}</h1>
+    <p>{{ animal.name }} {{ animal.description }}</p>
+    {% for media in medias %}
+        {% if media.is_image %}
+            <img src="{{ media.file.url }}"/>
+        {% elif media.is_video %}
+            <p>video found but not supported yet</p>
+        {% endif %}
+    {% endfor %}
+{% endblock %}
