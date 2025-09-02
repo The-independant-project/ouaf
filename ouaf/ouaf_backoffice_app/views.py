@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django import forms
 from django.contrib import messages
-from django.forms import inlineformset_factory
+from django.forms import inlineformset_factory, BaseFormSet, modelformset_factory
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -10,7 +10,7 @@ from django.views.generic import TemplateView, ListView, DeleteView, UpdateView,
 from .mixins import BackofficeAccessRequiredMixin
 from ouaf_app.models import Event, Animal, Activity, OrganisationChartEntry, ActivityMedia, ActivityCategory, \
     AnimalMedia
-from .forms import PersonEditForm
+from .forms import PersonEditForm, AnimalMediaForm
 from ouaf_app.signals import *
 from django.db import transaction
 
@@ -94,6 +94,9 @@ class AnimalListView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, Lis
     template_name = "backoffice/animals/list.html"
     permission_required = animal_view.perm_name()
     raise_exception = True
+
+
+
 class AnimalCreateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, CreateView):
     model = Animal
     fields = ["name", "description", "birth", "death", "pet_amount"]
@@ -106,8 +109,9 @@ class AnimalCreateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, C
         return inlineformset_factory(
             Animal,
             AnimalMedia,
+            form=AnimalMediaForm,
             fields=["file", "url", "caption", "position"],
-            extra=2,
+            extra=1,
             can_delete=True,
         )
 
@@ -158,6 +162,7 @@ class AnimalEditView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, Upd
         return inlineformset_factory(
             Animal,
             AnimalMedia,
+            form=AnimalMediaForm,
             fields=["file", "url", "caption", "position"],
             extra=0,
             can_delete=True

@@ -1,5 +1,5 @@
 from django import forms
-from ouaf_app.models import Person
+from ouaf_app.models import Person, Animal
 from ouaf_app.groups import *
 
 
@@ -34,3 +34,10 @@ class PersonEditForm(forms.ModelForm):
         self.instance.set_group(GROUP_VOLUNTEER, self.cleaned_data['is_volunteer'])
         self.instance.set_group(GROUP_MEMBER,  self.cleaned_data['is_member'])
         return super().save(*args, **kwargs)
+
+
+class AnimalMediaForm(forms.ModelForm):
+    template_name = "backoffice/animals/baseForm.html"
+    class Meta:
+        model = Animal
+        fields = ["name", "description", "birth", "death", "pet_amount"]

@@ -1,0 +1,43 @@
+<div class="form__row span-full"
+     style="border:1px dashed var(--clr-primary-dark); padding:1rem; border-radius:var(--radius);">
+    {% for hidden in form.hidden_fields %}
+    {{ hidden }}
+    {% endfor %}
+
+    <div class="form__row">
+        <label class="form__label" for="{{ form.file.id_for_label }}">Fichier</label>
+        {{ form.file }}
+    </div>
+
+    <div class="form__row">
+        <label class="form__label" for="{{ form.url.id_for_label }}">URL</label>
+        {{ form.url }}
+        <p class="form__help">Image/vidéo distante ou URL YouTube. Laissez vide si vous uploadez un fichier.</p>
+    </div>
+
+    <div class="form__row">
+        <label class="form__label" for="{{ form.caption.id_for_label }}">Légende</label>
+        {{ form.caption }}
+    </div>
+
+    <div class="form__row">
+        <label class="form__label" for="{{ form.position.id_for_label }}">Position</label>
+        {{ form.position }}
+    </div>
+
+    {% if form.DELETE %}
+    <div class="form__row">
+        <label class="form__label" for="{{ mf.DELETE.id_for_label }}">Supprimer</label>
+        {{ form.DELETE }}
+    </div>
+    {% endif %}
+
+    <div class="fieldWrapper">
+        {% for field in form.visible_fields %}
+        {% if field.errors %}
+        {{ field.errors }}
+        {{ field.label_tag }} {{ field }}
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
