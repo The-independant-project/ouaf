@@ -87,7 +87,7 @@ class Animal(models.Model):
     description = models.CharField(max_length=1000, null=True, blank=True)
     birth = models.DateField(_("Date de naissance"), null=True, blank=True)
     death = models.DateField(_("Date de décès"), null=True, blank=True)
-    pet_amount = models.PositiveIntegerField(_("Nombre de caresses"), null=True, blank=True)
+    pet_amount = models.PositiveIntegerField(_("Nombre de caresses"), default=0, blank=True)
 
 
 class OrganisationChartEntry(models.Model):
