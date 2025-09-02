@@ -13,6 +13,8 @@ from ouaf_app.models import Event, Animal, Activity, OrganisationChartEntry, Act
 from .forms import PersonEditForm, MediaForm
 from ouaf_app.signals import *
 from django.db import transaction
+from django.utils.translation import gettext as _
+
 
 User = get_user_model()
 

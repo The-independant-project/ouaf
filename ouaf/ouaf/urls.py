@@ -20,14 +20,26 @@ from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.static import serve
+from django.views.i18n import JavaScriptCatalog
+from django.conf.urls.i18n import i18n_patterns
+
 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include('ouaf_app.urls')),
-    path("backoffice/", include('ouaf_backoffice_app.urls')),
     path("index/", RedirectView.as_view(url="/", permanent=True)),
+    path("i18n/", include("django.conf.urls.i18n")),
+    # TO use i18n within JS scripts #
+    path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
 ]
+
+urlpatterns += i18n_patterns(
+    path("admin/", admin.site.urls),
+    path("", include("ouaf_app.urls")),
+    path("backoffice/", include('ouaf_backoffice_app.urls')),
+    prefix_default_language=True,
+)
 
 if settings.DEBUG:
     from debug_toolbar.toolbar import debug_toolbar_urls

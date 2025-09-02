@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, Group
 from django.conf import settings
 from .groups import *
+from django.utils.translation import gettext_lazy as _
 
 
 # Create your models here.
@@ -23,10 +24,10 @@ class Person(AbstractUser):
     is_active
     date_joined
     """
-    address = models.CharField(max_length=1000)
-    city = models.CharField(max_length=100)
-    country = models.CharField(max_length=100)
-    newsletter_subscription = models.BooleanField(default=False)
+    address = models.CharField(_("Adresse"), max_length=1000)
+    city = models.CharField(_("Ville"), max_length=100)
+    country = models.CharField(_("Pays"), max_length=100)
+    newsletter_subscription = models.BooleanField(_("Abonnement à la newsletter"), default=False)
 
     def belongs_to_group(self, group_name):
         return self.groups.filter(name=group_name).exists()
@@ -37,70 +38,85 @@ class Person(AbstractUser):
 
     class Meta:
         permissions = [
-            ("can_change_user_role", "Can change user roles")
+            ("can_change_user_role", _("Peut changer les rôles utilisateurs"))
         ]
 
 
 class Event(models.Model):
-    summary = models.CharField(max_length=500)
-    description = models.TextField()
-    start = models.DateTimeField()
-    until = models.DateTimeField()  # end date, primary cluster key of the table
-    duration = models.DurationField()
-    organizer = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL,
-                                  related_name='organiser2person')  # index
-    attendees = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='attendees2person')
-    address = models.CharField(max_length=1000)
-    latitude = models.FloatField()
-    longitude = models.FloatField()
-    is_published = models.BooleanField(default=False)
+    summary = models.CharField(_("Résumé"), max_length=500)
+    description = models.TextField(_("Description"))
+    start = models.DateTimeField(_("Date de début"))
+    until = models.DateTimeField(_("Date de fin"))
+    duration = models.DurationField(_("Durée"))
+    organizer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Organisateur"),
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="organiser2person"
+    )
+    attendees = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Participants"),
+        related_name="attendees2person"
+    )
+    address = models.CharField(_("Adresse"), max_length=1000)
+    latitude = models.FloatField(_("Latitude"))
+    longitude = models.FloatField(_("Longitude"))
+    is_published = models.BooleanField(_("Publié"), default=False)
 
     class Meta:
         permissions = [
-            ("can_publish_event", "Can publish an event"),
+            ("can_publish_event", _("Peut publier un événement")),
         ]
 
 
 class MemberPayment(models.Model):
-    personId = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)  # index
-    paymentDate = models.DateTimeField()  # end date, primary cluster key of the table
-    amount = models.FloatField()
+    personId = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Personne"),
+        null=True,
+        on_delete=models.SET_NULL
+    )
+    paymentDate = models.DateTimeField(_("Date de paiement"))
+    amount = models.FloatField(_("Montant"))
 
 
 class Animal(models.Model):
-    name = models.CharField(max_length=100, null=True)
+    name = models.CharField(_("Nom"), max_length=100)
     description = models.CharField(max_length=1000, null=True)
-    birth = models.DateTimeField(null=True, blank=True)
-    death = models.DateTimeField(null=True, blank=True)
-    pet_amount = models.IntegerField()
+    birth = models.DateTimeField(_("Date de naissance"))
+    death = models.DateTimeField(_("Date de décès"))
+    pet_amount = models.IntegerField(_("Nombre d’animaux"))
+
 
 class OrganisationChartEntry(models.Model):
-    first_name = models.CharField(max_length=1000)
-    last_name = models.CharField(max_length=1000)
-    role = models.CharField(max_length=26)
-    description = models.TextField(max_length=1000)
-    photo = models.ImageField(upload_to='images/organisationChart', blank=True)
+    first_name = models.CharField(_("Prénom"), max_length=1000)
+    last_name = models.CharField(_("Nom"), max_length=1000)
+    role = models.CharField(_("Rôle"), max_length=26)
+    description = models.TextField(_("Description"), max_length=1000)
+    photo = models.ImageField(_("Photo"), upload_to='images/organisationChart', blank=True)
 
 
 class ActivityCategory(models.Model):
-    title = models.CharField(max_length=100)
-    image = models.ImageField(upload_to='images/categories')
+    title = models.CharField(_("Titre"), max_length=100)
+    image = models.ImageField(_("Image"), upload_to='images/categories')
 
     def __str__(self):
         return self.title
 
 
 class Activity(models.Model):
-    title = models.CharField(max_length=1000)
-    category = models.ForeignKey(ActivityCategory, null=True, blank=True, on_delete=models.CASCADE)
-    description = models.TextField()
+    title = models.CharField(_("Titre"), max_length=1000)
+    category = models.ForeignKey(ActivityCategory, verbose_name=_("Catégorie"), null=True, blank=True,
+                                 on_delete=models.CASCADE)
+    description = models.TextField(_("Description"))
 
 
 class AbstractMedia(models.Model):
-    # activity = models.ForeignKey(Activity, on_delete=models.CASCADE(), related_name='media')
-    url = models.URLField(blank=True)
-    caption = models.CharField(max_length=200, blank=True)
-    position = models.PositiveIntegerField(default=0)
+    url = models.URLField(_("URL"), blank=True)
+    caption = models.CharField(_("Légende"), max_length=200, blank=True)
+    position = models.PositiveIntegerField(_("Position"), default=0)
 
     class Meta:
         abstract = True
@@ -125,8 +141,8 @@ class AbstractMedia(models.Model):
 
 
 class ActivityMedia(AbstractMedia):
-    activity = models.ForeignKey(Activity, on_delete=models.CASCADE, related_name="media")
-    file = models.FileField(upload_to='activities/media', blank=True)
+    activity = models.ForeignKey(Activity, verbose_name=_("Activité"), on_delete=models.CASCADE, related_name="media")
+    file = models.FileField(_("Fichier"), upload_to='activities/media', blank=True)
 
 class AnimalMedia(AbstractMedia):
     animal = models.ForeignKey(Animal, null=False, blank=False, on_delete=models.CASCADE, related_name='media')

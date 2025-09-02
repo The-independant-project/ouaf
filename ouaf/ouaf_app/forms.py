@@ -3,6 +3,8 @@ from django.forms.widgets import PasswordInput
 from .models import Person
 from django import forms
 import phonenumbers
+from django.utils.translation import gettext_lazy as _
+
 
 class RegistrationForm(UserCreationForm):
     username = forms.CharField(required=True)

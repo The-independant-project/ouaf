@@ -1,0 +1,174 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-09-02 20:59+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: ouaf_app/models.py:27 ouaf_app/models.py:63 ouaf_backoffice_app/forms.py:28
+msgid "Adresse"
+msgstr "Adresse"
+
+#: ouaf_app/models.py:28 ouaf_backoffice_app/forms.py:29
+msgid "Ville"
+msgstr "Ville"
+
+#: ouaf_app/models.py:29 ouaf_backoffice_app/forms.py:30
+msgid "Pays"
+msgstr "Pays"
+
+#: ouaf_app/models.py:30 ouaf_backoffice_app/forms.py:31
+msgid "Abonnement à la newsletter"
+msgstr "Abonnement à la newsletter"
+
+#: ouaf_app/models.py:41
+msgid "Peut changer les rôles utilisateurs"
+msgstr "Peut changer les rôles utilisateurs"
+
+#: ouaf_app/models.py:46
+msgid "Résumé"
+msgstr "Résumé"
+
+#: ouaf_app/models.py:47 ouaf_app/models.py:96 ouaf_app/models.py:112
+msgid "Description"
+msgstr "Description"
+
+#: ouaf_app/models.py:48
+msgid "Date de début"
+msgstr "Date de début"
+
+#: ouaf_app/models.py:49
+msgid "Date de fin"
+msgstr "Date de fin"
+
+#: ouaf_app/models.py:50
+msgid "Durée"
+msgstr "Durée"
+
+#: ouaf_app/models.py:53
+msgid "Organisateur"
+msgstr "Organisateur"
+
+#: ouaf_app/models.py:60
+msgid "Participants"
+msgstr "Participants"
+
+#: ouaf_app/models.py:64
+msgid "Latitude"
+msgstr "Latitude"
+
+#: ouaf_app/models.py:65
+msgid "Longitude"
+msgstr "Longitude"
+
+#: ouaf_app/models.py:66
+msgid "Publié"
+msgstr "Publié"
+
+#: ouaf_app/models.py:70
+msgid "Peut publier un événement"
+msgstr "Peut publier un événement"
+
+#: ouaf_app/models.py:77
+msgid "Personne"
+msgstr "Personne"
+
+#: ouaf_app/models.py:81
+msgid "Date de paiement"
+msgstr "Date de paiement"
+
+#: ouaf_app/models.py:82
+msgid "Montant"
+msgstr "Montant"
+
+#: ouaf_app/models.py:86 ouaf_app/models.py:94 ouaf_backoffice_app/forms.py:10
+msgid "Nom"
+msgstr "Nom"
+
+#: ouaf_app/models.py:87
+msgid "Date de naissance"
+msgstr "Date de naissance"
+
+#: ouaf_app/models.py:88
+msgid "Date de décès"
+msgstr "Date de décès"
+
+#: ouaf_app/models.py:89
+msgid "Nombre d’animaux"
+msgstr "Nombre d’animaux"
+
+#: ouaf_app/models.py:93 ouaf_backoffice_app/forms.py:9
+msgid "Prénom"
+msgstr "Prénom"
+
+#: ouaf_app/models.py:95
+msgid "Rôle"
+msgstr "Rôle"
+
+#: ouaf_app/models.py:97
+msgid "Photo"
+msgstr "Photo"
+
+#: ouaf_app/models.py:101 ouaf_app/models.py:109
+msgid "Titre"
+msgstr "Titre"
+
+#: ouaf_app/models.py:102
+msgid "Image"
+msgstr "Image"
+
+#: ouaf_app/models.py:110
+msgid "Catégorie"
+msgstr "Catégorie"
+
+#: ouaf_app/models.py:116
+msgid "URL"
+msgstr "URL"
+
+#: ouaf_app/models.py:117
+msgid "Légende"
+msgstr "Légende"
+
+#: ouaf_app/models.py:118
+msgid "Position"
+msgstr "Position"
+
+#: ouaf_app/models.py:143
+msgid "Activité"
+msgstr "Activité"
+
+#: ouaf_app/models.py:144
+msgid "Fichier"
+msgstr "Fichier"
+
+
+#: ouaf_backoffice_app/forms.py:8
+msgid "Nom d’utilisateur"
+msgstr "Nom d’utilisateur"
+
+#: ouaf_backoffice_app/forms.py:11
+#, fuzzy
+#| msgid "Adresse"
+msgid "Adresse e-mail"
+msgstr "Adresse"
+
+#: ouaf_backoffice_app/forms.py:12
+msgid "Bénévole"
+msgstr "Bénévole"
+
+#: ouaf_backoffice_app/forms.py:13
+msgid "Adhérent"
+msgstr "Adhérent"
