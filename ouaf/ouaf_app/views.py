@@ -1,3 +1,4 @@
+from django.db.models import Prefetch
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import login_required, login_not_required
@@ -5,10 +6,9 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, FormView
 from django.http import HttpRequest
 from .forms import PersonForm, RegistrationForm, ContactForm
-from .models import OrganisationChartEntry, Activity, ActivityCategory
+from .models import OrganisationChartEntry, Activity, ActivityCategory, Animal, AnimalMedia
 from django.contrib import messages
 from django.utils.translation import gettext as _
-
 
 
 # Create your views here.
@@ -72,7 +72,7 @@ class ActivityCategoryListView(ListView):
     model = ActivityCategory
     template_name = "activities/list.html"
     context_object_name = "categories"
-
+    raise_exception = True
 
 class ActivitiesByCategoryView(ListView):
     model = Activity
@@ -87,7 +87,6 @@ class ActivitiesByCategoryView(ListView):
         ctx["category"] = ActivityCategory.objects.get(pk=self.kwargs["pk"])
         return ctx
 
-
 class ContactView(FormView):
     template_name = "contact/contact.html"
     form_class = ContactForm
@@ -99,3 +98,17 @@ class ContactView(FormView):
         #!!!!!!!!!!! here mail server !!!!!!!!!!!!!!!!!
         messages.success(self.request, "Merci ! Votre message a bien été enregistré. Nous vous répondrons au plus vite.")
         return super().form_valid(form)
+
+
+def animal_list(request):
+    animals = Animal.objects.prefetch_related(Prefetch("media", to_attr="medias")).all()
+    for animal in animals:
+        if animal.medias:
+            pres_image = next(media for media in animal.medias if media.is_image)
+            if pres_image:
+                animal.presentation_image = pres_image.file
+    return render(request, "animals/list.html", { "animals": animals })
+def animal_detail(request, animal_id):
+    animal = Animal.objects.filter(id=animal_id).first()
+    medias = AnimalMedia.objects.filter(animal_id=animal_id)
+    return render(request, "animals/detail.html", { "animal": animal, "medias": medias })

@@ -14,8 +14,8 @@ urlpatterns = [
     path("activities/<int:pk>/", views.ActivityDetailView.as_view(), name="activity_detail"),
     path("activities/<int:pk>/update/", views.ActivityUpdateView.as_view(), name="activity_update"),
     path("activities/<int:pk>/delete/", views.ActivityDeleteView.as_view(), name="activity_delete"),
-    path("activities/categories/new/modal/",views.ActivityCategoryCreateModalView.as_view(),
-         name="activity_category_modal",),
+    path("activities/categories/new/modal/", views.ActivityCategoryCreateModalView.as_view(),
+         name="activity_category_modal", ),
 
     path("events/", views.EventListView.as_view(), name="event_list"),
     path("events/new/", views.EventCreateView.as_view(), name="event_create"),
@@ -23,6 +23,9 @@ urlpatterns = [
     path("events/<int:pk>/delete/", views.EventDeleteView.as_view(), name="event_delete"),
 
     path("animals/", views.AnimalListView.as_view(), name="animal_list"),
+    path("animals/new", views.AnimalCreateView.as_view(), name="animal_create"),
+    path("animals/<int:pk>/edit/", views.AnimalEditView.as_view(), name="animal_edit"),
+    path("animals/<int:pk>/delete/", views.AnimalDeleteView.as_view(), name="animal_delete"),
 
     path("team/", views.TeamMemberListView.as_view(), name="team_list"),
     path("team/new", views.TeamMemberCreateView.as_view(), name="team_create"),

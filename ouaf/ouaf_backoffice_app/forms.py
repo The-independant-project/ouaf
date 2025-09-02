@@ -1,5 +1,5 @@
 from django import forms
-from ouaf_app.models import Person
+from ouaf_app.models import Person, Animal
 from ouaf_app.groups import *
 from django.utils.translation import gettext_lazy as _
 
@@ -42,5 +42,10 @@ class PersonEditForm(forms.ModelForm):
 
     def save(self, *args, **kwargs):
         self.instance.set_group(GROUP_VOLUNTEER, self.cleaned_data['is_volunteer'])
+
         self.instance.set_group(GROUP_MEMBER, self.cleaned_data['is_member'])
         return super().save(*args, **kwargs)
+
+
+class MediaForm(forms.ModelForm):
+    template_name = "backoffice/forms/media.html"
