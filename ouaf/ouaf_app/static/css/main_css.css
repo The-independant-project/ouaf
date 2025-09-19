@@ -1221,6 +1221,77 @@ body.no-scroll {
 }
 
 
+.animal__details {
+    display: flex;
+    max-width: 66%;
+    flex-direction: column;
+    align-items: center;
+    margin-inline: auto;
+}
+
+.animal__details__presentation
+{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.animal__presentation__photo {
+    flex: 1;
+    margin-right: 20px;
+}
+.animal__presentation__photo img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+.animal__info {
+    flex: 1;
+}
+.animal__photos__gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+.animal__photos__gallery img {
+    max-width: 40%;
+    max-height: 500px;
+    border-radius: 8px;
+    object-fit: cover;
+    cursor:pointer;
+    align-self: center;
+    transition: transform .2s;
+}
+.animal__photos__gallery img:hover {
+    transform: scale(1.05);
+}
+
+/* Lightbox Styles */
+.lightbox-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+.lightbox-container img {
+    max-width: 95%;
+    max-height: 95%;
+}
+.lightbox-container .close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 30px;
+    color: white;
+    cursor: pointer;
+}
 
 
 

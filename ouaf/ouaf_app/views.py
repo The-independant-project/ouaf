@@ -111,4 +111,8 @@ def animal_list(request):
 def animal_detail(request, animal_id):
     animal = Animal.objects.filter(id=animal_id).first()
     medias = AnimalMedia.objects.filter(animal_id=animal_id)
+    if medias:
+        pres_image = next(media for media in medias if media.is_image)
+        if pres_image:
+            animal.presentation_image = pres_image.file
     return render(request, "animals/detail.html", { "animal": animal, "medias": medias })
