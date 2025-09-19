@@ -1,19 +1,56 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block subtitle %} - Animaux{% endblock %}
 
 {% block content %}
-<h1>Animaux</h1>
+<section class="team" aria-labelledby="team-title">
+  <header class="team__header">
+    <h1 id="team-title">Animaux</h1>
+  </header>
 
-<ul>
+  <ul class="team__list" role="list">
     {% for animal in animals %}
-        <li>
-            <a href="{% url 'animal_detail' animal.id %}">{{ animal.name }} {{ animal.description }}</a>
-            {% if animal.presentation_image %}
-                <img src="{{ animal.presentation_image.url }}"/>
-            {% endif %}
-        </li>
-        <br/>
+      <li class="team__card">
+        <article class="team__person" aria-labelledby="team-name-{{ forloop.counter }}">
+          <figure class="team__figure">
+            <a href="{% url 'animal_detail' animal.id %}" style="text-decoration-line: none">
+                <div class="team__photoWrap">
+                    {% if animal.presentation_image %}
+                    <img
+                      class="team__photo"
+                      src="{{ animal.presentation_image.url }}"
+                      alt="Photo de l'animal appelé {{ animal.name }}"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    {% else %}
+                    <img
+                      class="team__photo"
+                      src="{% static 'images/avatar_placeholder.svg' %}"
+                      alt="Photo de l'animal appelé {{ animal.name }}"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    {% endif %}
+                </div>
+                <figcaption class="team__caption">
+                  <h3 class="team__name" id="team-name-{{ forloop.counter }}">
+                   <strong>{{ animal.name }}</strong>
+                  </h3>
+                  {% if animal.description %}
+                    <p class="team__bio">
+                      {{ animal.description }}
+                    </p>
+                  {% endif %}
+                </figcaption>
+            </a>
+          </figure>
+        </article>
+      </li>
+    {% empty %}
+      <li class="team__empty">Aucun animal pour le moment.</li>
     {% endfor %}
-</ul>
+  </ul>
+</section>
 {% endblock %}
