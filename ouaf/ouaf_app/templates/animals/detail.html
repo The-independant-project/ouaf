@@ -1,15 +1,53 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block subtitle %} - {{animal.name}}{% endblock %}
 
 {% block content %}
-<h1>{{animal.name}}</h1>
-    <p>{{ animal.name }} {{ animal.description }}</p>
-    {% for media in medias %}
-        {% if media.is_image %}
-            <img src="{{ media.file.url }}"/>
-        {% elif media.is_video %}
-            <p>video found but not supported yet</p>
+<section class="animal__details">
+    <h1>{{animal.name}}</h1>
+    <div class="animal__details__presentation">
+        <div class="animal__presentation__photo">
+        {% if animal.presentation_image %}
+            <img src="{{ animal.presentation_image.url }}" alt="Photo de présentation de {{ animal.name }}">
+        {% else %}
+            <img src="{% static 'images/avatar_placeholder.svg' %}" alt="Photo par défaut pour la présentation de {{ animal.name }}">
         {% endif %}
-    {% endfor %}
+        </div>
+        <div class="animal__info">
+            <h2>Date de naissance</h2>
+            <p>{{ animal.birth }}</p>
+            <h2>Description</h2>
+            <p>{{ animal.description }}</p>
+        </div>
+    </div>
+
+    <h2>Photos</h2>
+    <div class="animal__photos__gallery">
+        {% for media in medias %}
+            {% if media.is_image %}
+                <img src="{{ media.file.url }}" onclick="openLightbox('{{ media.file.url }}')" alt="Photo {{ forloop.counter }} de {{ animal.name }}"/>
+            {% elif media.is_video %}
+                <p>video found but not supported yet</p>
+            {% endif %}
+        {% endfor %}
+    </div>
+</section>
+<div id="lightbox" class="lightbox-container" onclick="closeLightbox()">
+    <div class="close" onclick="closeLightbox();">&times;</div>
+    <img id="lightbox-img" src="" alt="Image agrandie">
+</div>
+<script>
+    function openLightbox(src) {
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        lightboxImg.src = src;
+        lightbox.style.display = 'flex';
+    }
+
+    function closeLightbox() {
+        const lightbox = document.getElementById('lightbox');
+        lightbox.style.display = 'none';
+    }
+</script>
 {% endblock %}

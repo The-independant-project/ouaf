@@ -26,7 +26,7 @@ from django.conf.urls.i18n import i18n_patterns
 
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    #path("admin/", admin.site.urls), no need to use that because we include it in the urlspatterns
     path("", include('ouaf_app.urls')),
     path("index/", RedirectView.as_view(url="/", permanent=True)),
     path("i18n/", include("django.conf.urls.i18n")),
