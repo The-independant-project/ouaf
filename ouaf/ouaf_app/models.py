@@ -148,8 +148,6 @@ class AnimalMedia(AbstractMedia):
     animal = models.ForeignKey(Animal, null=False, blank=False, on_delete=models.CASCADE, related_name='media')
     file = models.FileField(upload_to="animals/media", null=False, blank=False)
     def __str__(self):
-
-
         return f"{self.animal.name} - {super().__str__()}"
     class Meta:
         ordering = ["position", "id"]
