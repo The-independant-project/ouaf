@@ -1215,6 +1215,10 @@ body.no-scroll {
 .media_form__preview {
   flex: 1;
 }
+.media_form__preview .media_form__preview_content {
+  height: 150px;
+  object-fit: contain;
+}
 .media_form__row {
   display: flex;
   flex-wrap: wrap;

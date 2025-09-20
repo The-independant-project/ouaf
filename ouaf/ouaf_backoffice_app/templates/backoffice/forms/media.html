@@ -43,10 +43,19 @@
     </div>
 
     <div class="media_form__preview">
-        <strong>Prévisualisation:</strong>
-        <br/>
         {% if form.instance.file %}
-            <img style="max-height:150px" src="{{ form.instance.file.url }}"/>
+            <strong>Prévisualisation:</strong>
+            <br/>
+            <img class="media_form__preview_content" src="{{ form.instance.file.url }}" alt="Prévisualisation"/>
+        {% elif form.instance.url and "youtu" in form.instance.url %}
+            <strong>Prévisualisation:</strong>
+            <br/>
+            <div class="media_form__preview_content">
+            <button type="button" data-yt="{{ form.instance.url }}"
+                    aria-label="Lire la vidéo YouTube"
+                    class="yt-thumb js-yt-thumb"
+                    style="--yt-thumb: url({{ form.instance.url }});">::after</button>
+            </div>
         {% endif %}
     </div>
 
@@ -58,4 +67,47 @@
         {% endif %}
         {% endfor %}
     </div>
+
+    <script>
+        // Pose les miniatures au DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.js-yt-thumb').forEach(btn => {
+                const id = ytIdFromUrl(btn.dataset.yt || '');
+                if (!id) {
+                    btn.outerHTML = '<span>Vidéo indisponible</span>';
+                    return;
+                }
+                btn.style.setProperty('--yt-thumb', `url(https://img.youtube.com/vi/${id}/hqdefault.jpg)`);
+                // click -> remplace par iframe (pas de gestion “unique”, on autorise plusieurs players)
+                btn.addEventListener('click', () => {
+                    const iframe = document.createElement('iframe');
+                    iframe.src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
+                    iframe.title = 'YouTube video';
+                    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+                    iframe.allowFullscreen = true;
+                    iframe.style.width = '100%';
+                    iframe.style.height = '100%';
+                    // wrapper pour garder le ratio du slide
+                    const wrap = document.createElement('div');
+                    wrap.appendChild(iframe);
+                    btn.replaceWith(wrap);
+                }, {once: true});
+            });
+        });
+
+        function ytIdFromUrl(u) {
+            try {
+                const a = document.createElement('a');
+                a.href = u;
+                if (a.hostname.includes('youtu.be')) return a.pathname.slice(1);
+                const p = new URLSearchParams(a.search);
+                if (p.get('v')) return p.get('v');
+                const parts = a.pathname.split('/');
+                const i = parts.indexOf('embed');
+                if (i >= 0 && parts[i + 1]) return parts[i + 1];
+            } catch (e) {
+            }
+            return null;
+        }
+        </script>
 </div>
