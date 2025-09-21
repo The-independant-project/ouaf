@@ -295,7 +295,6 @@ footer{
   cursor: pointer;
   line-height: 0;
   z-index: 100;
-  left: 2rem;
 }
 
 .header__toggleIcon {
@@ -446,6 +445,7 @@ body.no-scroll {
   .header__toggle {
     grid-area: toggle;
     display: inline-flex;
+    justify-self: end;
   }
 
 
@@ -518,7 +518,7 @@ body.no-scroll {
 }
 
 .index__section__main_logo {
-  height:60vh;
+  max-height:60vh;
   margin: 5rem;
 }
 
