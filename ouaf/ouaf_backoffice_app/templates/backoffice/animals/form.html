@@ -6,13 +6,13 @@
     {% csrf_token %}
 
     {% if form.errors %}
-    {{form.errors}}
+    {{ form.errors }}
     {% endif %}
 
     {{ form }}
 
     {% if formset.errors %}
-    {{formset.errors}}
+    {{ formset.errors }}
     {% endif %}
 
     {{ media_formset.management_form }}
@@ -23,24 +23,24 @@
     </div>
 
     <div>
-        <input type="button" value="Ajouter un média" id="add-media">
+        <input type="button" value="Ajouter un média" id="add-media" onclick="add_new_media()">
     </div>
 
     <div id="empty-form" style="display:none">
         {{ media_formset.empty_form }}
     </div>
     <script>
-        const add_more_button = document.getElementById('add-media');
-        const id_media_total_forms = document.getElementById('id_media-TOTAL_FORMS');
-        const forms_list = document.getElementById('media-forms');
-        const empty_form = document.getElementById('empty-form');
-        add_more_button?.addEventListener("click", () => {
-            var form_idx = id_media_total_forms.value;
-            var new_div = document.createElement('div');
+        function add_new_media()
+        {
+            let id_media_total_forms = document.getElementById('id_media-TOTAL_FORMS');
+            let forms_list = document.getElementById('media-forms');
+            let empty_form = document.getElementById('empty-form');
+            let form_idx = id_media_total_forms.value;
+            let new_div = document.createElement('div');
             new_div.innerHTML = empty_form.innerHTML.replace(/__prefix__/g, form_idx);
             forms_list.appendChild(new_div.firstElementChild);
             id_media_total_forms.value = parseInt(form_idx) + 1;
-        });
+        }
     </script>
 
     <input type="submit" value="Confirmer">

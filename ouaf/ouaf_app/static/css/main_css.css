@@ -1,6 +1,7 @@
 :root{
   --clr-primary: #f9cac2;   /* Couleur de marque (rose) */
   --clr-primary-dark: #f3a9a0; /* Couleur de marque variante sombre (hover/bordures) */
+  --clr-primary-transparent: #f9cac233;
   --clr-ink: #2b2b2b; /* Texte principal */
   --clr-light-ink: #444;
   --clr-muted: #6b6b6b; /* Texte secondaire */
@@ -572,10 +573,10 @@ body.no-scroll {
     font-size: .95rem;
   }
 
-  /* Forme */
   .account__body {
     padding: 1.25rem;
   }
+  /* Forme */
   .formGrid {
     display: grid;
     gap: var(--space-4);
@@ -596,6 +597,21 @@ body.no-scroll {
   .form__required {
     color: #c62828;
     margin-left: .25rem;
+  }
+  /* Aide & erreurs */
+  .form__help {
+    color: var(--clr-muted);
+    font-size: .9rem;
+    margin: 0;
+  }
+  .form__errors {
+    color: #b00020;
+    font-size: .9rem;
+  }
+  .form__row.is-error input,
+  .form__row.is-error textarea,
+  .form__row.is-error select {
+    border-color: #b00020;
   }
 
   .account__card input[type="text"],
@@ -621,21 +637,6 @@ body.no-scroll {
     border-color: var(--clr-accent);
     box-shadow: 0 0 0 3px rgba(47,111,118,.15);
   }
-
-  .form__help {
-    color: var(--clr-muted);
-    font-size: .9rem;
-  }
-  .form__errors {
-    color: #b00020;
-    font-size: .9rem;
-  }
-  .form__row.is-error input,
-  .form__row.is-error textarea,
-  .form__row.is-error select {
-    border-color: #b00020;
-  }
-
   /* Actions */
   .account__foot {
     padding: 1rem 1.25rem 1.25rem;
@@ -1185,20 +1186,6 @@ body.no-scroll {
   }
 }
 
-/* Champs */
-.form__row {
-  display: grid;
-  gap: .4rem;
-}
-.form__label {
-  font-weight: 600;
-  color: var(--clr-ink);
-}
-.form__required {
-  color: #c62828;
-  margin-left: .25rem;
-}
-
 .contactForm input[type="text"],
 .contactForm input[type="email"],
 .contactForm textarea {
@@ -1224,16 +1211,6 @@ body.no-scroll {
   box-shadow: 0 0 0 3px rgba(47,111,118,.15);
 }
 
-/* Aide & erreurs */
-.form__help {
-  color: var(--clr-muted);
-  font-size: .9rem;
-  margin: 0;
-}
-.form__errors {
-  color: #b00020;
-  font-size: .9rem;
-}
 .contactForm__nonfield {
   margin: 0 0 1rem;
   padding: .75rem 1rem;
@@ -1252,6 +1229,50 @@ body.no-scroll {
 }
 
 
+/* Media form */
+.media_form__element
+{
+  background-color: var(--clr-primary-transparent);
+  border:1px solid var(--clr-primary-dark);
+  border-radius:var(--radius);
+  display: flex;
+  flex-wrap: wrap;
+  padding: .5rem;
+  margin-bottom: .3rem;
+}
+.media_form__data {
+  flex: 4;
+}
+.media_form__preview {
+  flex: 1;
+}
+.media_form__preview .media_form__preview_content {
+  height: 150px;
+  object-fit: contain;
+}
+.media_form__row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: .2rem;
+}
+.media_form__row .media_form__label {
+  flex: 1;
+  color: var(--clr-ink);
+  font-weight: bold;
+  min-width: 150px;
+  margin-right: .2rem;
+  margin-bottom: .1rem;
+}
+.media_form__row .media_form__input{
+  flex: 4;
+  gap: .4rem;
+}
+.media_form__delete{
+  display:none;
+}
+
+
+/* Animal */
 .animal__details {
     display: flex;
     max-width: var(--max-w);
