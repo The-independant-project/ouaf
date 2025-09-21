@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Nouvelle activité – Backoffice{% endblock %}
 
+
 {% block content %}
     <section class="account" aria-labelledby="activity-form-title">
         <div class="account__card">
@@ -64,7 +65,7 @@
 
                 <div id="media-forms" class="formGrid">
                     {% for mf in media_formset %}
-                        {{ mf }} 
+                        {{ mf }}
                     {% endfor %}
                 </div>
 
