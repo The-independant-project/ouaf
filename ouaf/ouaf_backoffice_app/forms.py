@@ -2,6 +2,7 @@ from django import forms
 from ouaf_app.models import Person, Animal
 from ouaf_app.groups import *
 from django.utils.translation import gettext_lazy as _
+from phonenumber_field.formfields import PhoneNumberField as PhoneFormField
 
 
 class PersonEditForm(forms.ModelForm):
@@ -11,6 +12,8 @@ class PersonEditForm(forms.ModelForm):
     email = forms.EmailField(required=True, label=_("Adresse e-mail"))
     is_volunteer = forms.BooleanField(required=False, label=_("Bénévole"))
     is_member = forms.BooleanField(required=False, label=_("Adhérent"))
+    phone_number = PhoneFormField(region="FR", required=True)
+
 
     class Meta:
         model = Person
@@ -22,6 +25,7 @@ class PersonEditForm(forms.ModelForm):
             "address",
             "city",
             "country",
+            "phone_number",
             "newsletter_subscription",
         ]
         labels = {

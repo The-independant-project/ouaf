@@ -3,6 +3,7 @@ from django.forms.widgets import PasswordInput
 from .models import Person
 from django import forms
 import phonenumbers
+from phonenumber_field.formfields import PhoneNumberField as PhoneFormField
 from django.utils.translation import gettext_lazy as _
 
 
@@ -11,6 +12,7 @@ class RegistrationForm(UserCreationForm):
     first_name = forms.CharField(required=True)
     last_name = forms.CharField(required=True)
     email = forms.EmailField(required=True)
+    phone_number = PhoneFormField(region="FR", required=True)
 
     class Meta:
         model = Person
@@ -22,6 +24,7 @@ class RegistrationForm(UserCreationForm):
             "address",
             "city",
             "country",
+            "phone_number",
             "newsletter_subscription",
         ]
         widgets = {
@@ -35,6 +38,7 @@ class PersonForm(forms.ModelForm):
     first_name = forms.CharField(required=True)
     last_name = forms.CharField(required=True)
     email = forms.EmailField(required=True)
+    phone_number = PhoneFormField(region="FR", required=False)
 
     class Meta:
         model = Person
@@ -46,6 +50,7 @@ class PersonForm(forms.ModelForm):
             "address",
             "city",
             "country",
+            "phone_number",
             "newsletter_subscription",
         ]
 
