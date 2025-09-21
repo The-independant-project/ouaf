@@ -151,6 +151,9 @@ class ActivityMedia(AbstractMedia):
     activity = models.ForeignKey(Activity, verbose_name=_("Activité"), on_delete=models.CASCADE, related_name="media")
     file = models.FileField(_("Fichier"), upload_to='activities/media', blank=True)
 
+    class Meta:
+        ordering = ["position", "id"]
+
 class AnimalMedia(AbstractMedia):
     animal = models.ForeignKey(Animal, null=False, blank=False, on_delete=models.CASCADE, related_name='media')
     file = models.FileField(upload_to="animals/media", null=False, blank=False)

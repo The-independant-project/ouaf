@@ -6,7 +6,7 @@
 {% block content %}
     <section class="activities" aria-labelledby="activities-title">
         <header class="activities__header">
-            <h1 id="activities-title">Activités – {{ category.title }}</h1>
+            {% include "html/ouaf_h1.html" with text="Activités – "|add:category.title %}
             <p class="activities__intro">Découvrez les activités de la catégorie « {{ category.title }} ».</p>
         </header>
 

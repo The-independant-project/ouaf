@@ -896,6 +896,57 @@ body.no-scroll {
    ACTIVITIES (front) – clean
    =========================== */
 
+.team__intro{
+  max-width: 60ch;
+  margin: .5rem auto 0;
+  color: var(--clr-muted);
+}
+
+
+.categoryCard{
+  display:block;
+  width:100%;
+  aspect-ratio: 16 / 9;
+  position:relative;
+  overflow:hidden;
+  border-radius: var(--radius);
+  border: 3px solid var(--clr-primary);
+  box-shadow: 0 6px 18px rgba(0,0,0,.08);
+  background: #fff;
+  text-decoration:none;
+}
+
+
+.categoryCard__img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+}
+
+
+.categoryCard__title{
+  position:absolute;
+  inset:auto 0 0 0;
+  background: linear-gradient(transparent, rgba(0,0,0,.55));
+  color:#fff;
+  padding:.75rem 1rem;
+  font-weight:700;
+  letter-spacing:.2px;
+}
+
+
+.categoryCard:focus,
+.categoryCard:hover{
+  outline:none;
+  box-shadow: 0 6px 24px rgba(0,0,0,.12);
+  filter: brightness(.995);
+}
+
+
+
 
 .activities {
   max-width: var(--max-w);

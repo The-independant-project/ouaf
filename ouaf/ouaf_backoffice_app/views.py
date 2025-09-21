@@ -15,7 +15,6 @@ from ouaf_app.signals import *
 from django.db import transaction
 from django.utils.translation import gettext as _
 
-
 User = get_user_model()
 
 
@@ -96,7 +95,6 @@ class AnimalListView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, Lis
     template_name = "backoffice/animals/list.html"
     permission_required = animal_view.perm_name()
     raise_exception = True
-
 
 
 class AnimalCreateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, CreateView):
@@ -204,12 +202,14 @@ class AnimalEditView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, Upd
             "media_formset": media_formset,
         })
 
+
 class AnimalDeleteView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Animal
     template_name = "backoffice/animals/confirm_delete.html"
     permission_required = animal_delete.perm_name()
     success_url = reverse_lazy('backoffice:animal_list')
     raise_exception = True
+
 
 class ActivityListView(BackofficeAccessRequiredMixin, PermissionRequiredMixin, ListView):
     model = Activity
@@ -237,6 +237,7 @@ class ActivityCreateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin,
         return inlineformset_factory(
             Activity,
             ActivityMedia,
+            form=MediaForm,
             fields=["file", "url", "caption", "position"],
             extra=2,
             can_delete=True,
@@ -325,6 +326,7 @@ class ActivityUpdateView(BackofficeAccessRequiredMixin, PermissionRequiredMixin,
         return inlineformset_factory(
             Activity,
             ActivityMedia,
+            form=MediaForm,
             fields=["file", "url", "caption", "position"],
             extra=0,
             can_delete=True
