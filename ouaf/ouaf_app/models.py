@@ -5,6 +5,7 @@ from django.contrib.auth.models import AbstractUser, Group
 from django.conf import settings
 from .groups import *
 from django.utils.translation import gettext_lazy as _
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 # Create your models here.
@@ -28,6 +29,12 @@ class Person(AbstractUser):
     city = models.CharField(_("Ville"), max_length=100)
     country = models.CharField(_("Pays"), max_length=100)
     newsletter_subscription = models.BooleanField(_("Abonnement à la newsletter"), default=False)
+    phone_number = PhoneNumberField(
+        _("Téléphone"),
+        region="FR",
+        null=True,
+        blank=False
+    )
 
     def belongs_to_group(self, group_name):
         return self.groups.filter(name=group_name).exists()
