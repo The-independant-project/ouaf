@@ -50,42 +50,32 @@
             </ul>
 
             <div class="header__user">
-                {% if user.is_authenticated %}
-                <span class="header__greet">Hi {{ user.username }} !</span>
-
-                <!-- Desktop -->
-                <div class="header__userLinks">
-                    <a class="header__userLink" href="{% url 'account_edit' %}">Mon compte</a>
-                    <a class="header__userLink" href="{% url 'my_logout' %}">Déconnexion</a>
-                    {% if perms.ouaf_app.view_event %}
-                    <a class="header__userLink" href="{% url 'backoffice:home' %}">Backoffice</a>
-                    {% endif %}
-                </div>
-
-                <!-- Mobile -->
-                <ul class="header__userList">
-                    <li><a class="header__userLink" href="{% url 'account_edit' %}">Mon compte</a></li>
-                    <li><a class="header__userLink" href="{% url 'my_logout' %}">Déconnexion</a></li>
-                    {% if perms.ouaf_app.view_event %}
-                    <li><a class="header__userLink" href="{% url 'backoffice:home' %}">Backoffice</a></li>
+                <a class="header__dropdown__text">Mon compte</a>
+                <ul class="header__user__content">
+                    {% if user.is_authenticated %}
+                        <li class="header__item">
+                            <span class="header__greet">Hi {{ user.username }} !</span>
+                        </li>
+                        {% if perms.ouaf_app.view_event %}
+                            <li class="header__item">
+                                <a class="header__link" href="{% url 'backoffice:home' %}">Backoffice</a>
+                            </li>
+                        {% endif %}
+                        <li class="header__item">
+                            <a class="header__link" href="{% url 'account_edit' %}">Mes informations daada</a>
+                        </li>
+                        <li class="header__item">
+                            <a class="header__link" href="{% url 'my_logout' %}">Déconnexion</a>
+                        </li>
+                    {% else %}
+                        <li class="header__item">
+                            <a class="header__link" href="{% url 'signup' %}">S'inscrire</a>
+                        </li>
+                        <li class="header__item">
+                            <a class="header__link" href="{% url 'login' %}">Connexion</a>
+                        </li>
                     {% endif %}
                 </ul>
-
-                {% else %}
-                <p class="header__anonNote">Vous n'êtes pas connecté(e)</p>
-
-                <!-- Desktop -->
-                <div class="header__userLinks">
-                    <a class="header__userLink" href="{% url 'signup' %}">S'inscrire</a>
-                    <a class="header__userLink" href="{% url 'login' %}">Connexion</a>
-                </div>
-
-                <!-- Mobile -->
-                <ul class="header__userList">
-                    <li><a class="header__userLink" href="{% url 'signup' %}">S'inscrire</a></li>
-                    <li><a class="header__userLink" href="{% url 'login' %}">Connexion</a></li>
-                </ul>
-                {% endif %}
             </div>
         </nav>
     </div>
