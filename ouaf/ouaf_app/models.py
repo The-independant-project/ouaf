@@ -100,7 +100,7 @@ class Animal(models.Model):
 class OrganisationChartEntry(models.Model):
     first_name = models.CharField(_("Prénom"), max_length=1000)
     last_name = models.CharField(_("Nom"), max_length=1000)
-    role = models.CharField(_("Rôle"), max_length=26)
+    role = models.CharField(_("Rôle"), max_length=128)
     description = models.TextField(_("Description"), max_length=1000)
     photo = models.ImageField(_("Photo"), upload_to='images/organisationChart', blank=True)
 
