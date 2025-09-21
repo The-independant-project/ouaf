@@ -46,7 +46,13 @@
 
             <figcaption class="team__caption">
               <h3 class="team__name" id="team-name-{{ forloop.counter }}">
-                <strong>{{ member.first_name }} {{ member.last_name }} - {{ member.role }}</strong>
+                <strong>{{ member.first_name }} {{ member.last_name }}</strong>
+              </h3>
+              <h3 class="team__name" id="team-name-{{ forloop.counter }}">
+                <strong> - </strong>
+              </h3>
+              <h3 class="team__name" id="team-name-{{ forloop.counter }}">
+                <strong>{{ member.role }}</strong>
               </h3>
 
               {% if member.description %}
