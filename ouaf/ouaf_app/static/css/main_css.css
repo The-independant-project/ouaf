@@ -2,8 +2,11 @@
   --clr-primary: #f9cac2;   /* Couleur de marque (rose) */
   --clr-primary-dark: #f3a9a0; /* Couleur de marque variante sombre (hover/bordures) */
   --clr-ink: #2b2b2b; /* Texte principal */
+  --clr-light-ink: #444;
   --clr-muted: #6b6b6b; /* Texte secondaire */
-  --clr-bg: #fffaf9; /* Fond du footer  */
+  --clr-bg: #fff; /* Fond du main  */
+  --clr-header-bg: #fffaf9; /* Fond du header  */
+  --clr-footer-bg: #fffaf9; /* Fond du footer  */
   --clr-accent: #2f6f76; /* Liens */
   --clr-accent-hover: #25575b;  /* Hover vert */
 
@@ -38,7 +41,7 @@ footer{
 }
 
 .footer{
-  background: var(--clr-bg);
+  background: var(--clr-footer-bg);
   border-top: 4px solid var(--clr-primary);
   color: var(--clr-ink);
   font-size: 0.95rem;
@@ -285,7 +288,7 @@ footer{
   justify-content: center;
   position: relative;
   border: 1px solid var(--clr-primary-dark);
-  background: var(--clr-bg);
+  background: var(--clr-header-bg);
   border-radius: var(--radius);
   padding: 1rem;
   cursor: pointer;
@@ -364,7 +367,7 @@ footer{
 
 .header__link.is-active {
   border-color: var(--clr-primary-dark);
-  background: var(--clr-bg);
+  background: var(--clr-header-bg);
   text-decoration: none;
 }
 
@@ -448,7 +451,7 @@ body.no-scroll {
   .header__nav {
     position: fixed;
     inset: 0;
-    background: var(--clr-bg);
+    background: var(--clr-header-bg);
     padding: var(--space-6) var(--space-4);
     display: flex;
     flex-direction: column;
@@ -507,8 +510,36 @@ body.no-scroll {
 }
 
 
+/* Index */
+.index__section {
+  max-width: var(--max-w);
+  margin-inline: auto;
+}
 
+.index__section__main_logo {
+  height:60vh;
+  margin: 5rem;
+}
 
+.index__section__main_text {
+  text-align: justify;
+  color: var(--clr-ink);
+  line-height: 1.7rem;
+  font-size: 18px;
+}
+
+.mediation__page {
+  max-width: var(--max-w);
+  margin-inline: auto;
+  margin-bottom: 3rem;
+}
+
+.mediation__page__text {
+  text-align: justify;
+  color: var(--clr-ink);
+  line-height: 1.4rem;
+  font-size: 18px;
+}
 
 
 
@@ -613,7 +644,7 @@ body.no-scroll {
     flex-wrap: wrap;
     gap: var(--space-3);
     border-top: 1px dashed var(--clr-primary-dark);
-    background: var(--clr-bg);
+    background: var(--clr-footer-bg);
   }
   .btn {
     display: inline-flex;
@@ -763,7 +794,7 @@ body.no-scroll {
   object-fit: cover;
   border-radius: 50%;
   border: 4px solid var(--clr-primary);
-  background-color: var(--clr-bg);
+  background-color: var(--clr-footer-bg);
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
   position: relative;
   z-index: 1;
@@ -1223,7 +1254,7 @@ body.no-scroll {
 
 .animal__details {
     display: flex;
-    max-width: 66%;
+    max-width: var(--max-w);
     flex-direction: column;
     align-items: center;
     margin-inline: auto;

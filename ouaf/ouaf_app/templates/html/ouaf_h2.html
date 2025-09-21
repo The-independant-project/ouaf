@@ -1,0 +1,16 @@
+{% load static %}
+<h2 style="text-align: center;">
+    <img
+      src="{% static 'images/paw_image.svg' %}"
+      style="vertical-align:middle; height:30px; margin-right:0px; opacity: 0.8; transform: rotateZ(-45deg); filter: invert(87%) sepia(6%) saturate(2420%) hue-rotate(313deg) brightness(103%) contrast(95%);"
+      loading="lazy"
+      decoding="async"
+    />
+    <span style="color:var(--clr-primary)">—</span><span style="color:var(--clr-light-ink);"> {{ text }} </span><span style="color:var(--clr-primary)">—</span>
+    <img
+      src="{% static 'images/paw_image.svg' %}"
+      style="vertical-align:middle; height:30px; margin-left:0px; opacity: 0.8; transform: scaleX(-1) rotateZ(-45deg); filter: invert(87%) sepia(6%) saturate(2420%) hue-rotate(313deg) brightness(103%) contrast(95%);"
+      loading="lazy"
+      decoding="async"
+    />
+</h2>
