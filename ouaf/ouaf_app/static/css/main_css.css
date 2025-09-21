@@ -564,6 +564,31 @@ body.no-scroll {
 
 
 
+
+/*************SIGN IN ********/
+
+.helptext {
+  color: var(--clr-muted);
+  font-size: .9rem;
+  margin-top: .25rem;
+}
+.helptext ul { margin: .25rem 0 0; padding-left: 1.1rem; }
+.helptext li { margin: .15rem 0; }
+
+.form__row--checkbox label {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  font-weight: 600;
+}
+
+@media (min-width: 720px){
+  .span-half { grid-column: span 1; }
+  .span-full { grid-column: 1 / -1; }
+}
+
+
+
 /*************EDIT USER********/
 
 

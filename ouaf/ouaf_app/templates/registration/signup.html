@@ -3,61 +3,105 @@
 {% block subtitle %} - Inscription{% endblock %}
 
 {% block content %}
-<form method="post" action="{% url 'signup' %}">
-    {% csrf_token %}
-    {% if form.errors %}
-        {{form.errors}}
-    {% endif %}
-    <table>
-        <tr>
-            <td>{{ form.first_name.label_tag }}</td>
-            <td>{{ form.first_name }}</td>
-        </tr>
-        <tr>
-            <td>{{ form.last_name.label_tag }}</td>
-            <td>{{ form.last_name }}</td>
-        </tr>
-        <tr>
-            <td>{{ form.username.label_tag }}</td>
-            <td>{{ form.username }}</td>
-        </tr>
-        <tr>
-            <td>{{ form.password1.label_tag }}</td>
-            <td>{{ form.password1 }}</td>
-            <td>{{ form.password1.help_text }}</td>
-        </tr>
-        <tr>
-            <td>{{ form.password2.label_tag }}</td>
-            <td>{{ form.password2 }}</td>
-            <td>{{ form.password2.help_text }}</td>
-        </tr>
-        <tr>
-            <td>{{ form.phone_number.label_tag }}</td>
-            <td>{{ form.phone_number }}</td>
-        </tr>
-        <tr>
-            <td>{{ form.email.label_tag }}</td>
-            <td>{{ form.email }}</td>
-        </tr>
-        <tr>
-            <td>{{ form.address.label_tag }}</td>
-            <td>{{ form.address }}</td>
-        </tr>
-        <tr>
-            <td>{{ form.city.label_tag }}</td>
-            <td>{{ form.city }}</td>
-        </tr>
-        <tr>
-            <td>{{ form.country.label_tag }}</td>
-            <td>{{ form.country }}</td>
-        </tr>
-        <tr>
-            <td>{{ form.newsletter_subscription.label_tag }}</td>
-            <td>{{ form.newsletter_subscription }}</td>
-        </tr>
-    </table>
+<section class="account">
+  <div class="account__card">
+    <header class="account__head">
+      <h1 class="account__title">Créer un compte</h1>
+      <p class="account__meta">Les champs marqués <span class="form__required">*</span> sont obligatoires.</p>
+      {% if form.non_field_errors %}
+        <div class="form__nonfield">{{ form.non_field_errors }}</div>
+      {% endif %}
+    </header>
 
-    <input type="submit" value="Confirmer">
-    <input type="hidden" name="next" value="{{ next }}">
-</form>
+    <div class="account__body">
+      <form method="post" action="{% url 'signup' %}" novalidate>
+        {% csrf_token %}
+
+        <div class="formGrid">
+          <!-- Names -->
+          <div class="form__row {% if form.first_name.errors %}is-error{% endif %}">
+            <label class="form__label" for="{{ form.first_name.id_for_label }}">Prénom <span class="form__required">*</span></label>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}<p class="form__errors">{{ form.first_name.errors|striptags }}</p>{% endif %}
+          </div>
+
+          <div class="form__row {% if form.last_name.errors %}is-error{% endif %}">
+            <label class="form__label" for="{{ form.last_name.id_for_label }}">Nom <span class="form__required">*</span></label>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}<p class="form__errors">{{ form.last_name.errors|striptags }}</p>{% endif %}
+          </div>
+
+          <!-- Username & Email -->
+          <div class="form__row {% if form.username.errors %}is-error{% endif %}">
+            <label class="form__label" for="{{ form.username.id_for_label }}">Nom d’utilisateur <span class="form__required">*</span></label>
+            {{ form.username }}
+            {% if form.username.errors %}<p class="form__errors">{{ form.username.errors|striptags }}</p>{% endif %}
+          </div>
+
+          <div class="form__row {% if form.email.errors %}is-error{% endif %}">
+            <label class="form__label" for="{{ form.email.id_for_label }}">E-mail <span class="form__required">*</span></label>
+            {{ form.email }}
+            {% if form.email.errors %}<p class="form__errors">{{ form.email.errors|striptags }}</p>{% endif %}
+          </div>
+
+          <!-- Passwords -->
+          <div class="form__row span-full {% if form.password1.errors %}is-error{% endif %}">
+            <label class="form__label" for="{{ form.password1.id_for_label }}">Mot de passe <span class="form__required">*</span></label>
+            {{ form.password1 }}
+            {% if form.password1.help_text %}<div class="helptext">{{ form.password1.help_text|safe }}</div>{% endif %}
+            {% if form.password1.errors %}<p class="form__errors">{{ form.password1.errors|striptags }}</p>{% endif %}
+          </div>
+
+          <div class="form__row span-full {% if form.password2.errors %}is-error{% endif %}">
+            <label class="form__label" for="{{ form.password2.id_for_label }}">Confirmation du mot de passe <span class="form__required">*</span></label>
+            {{ form.password2 }}
+            {% if form.password2.help_text %}<div class="helptext">{{ form.password2.help_text|safe }}</div>{% endif %}
+            {% if form.password2.errors %}<p class="form__errors">{{ form.password2.errors|striptags }}</p>{% endif %}
+          </div>
+
+          <!-- Address -->
+          <div class="form__row span-full {% if form.address.errors %}is-error{% endif %}">
+            <label class="form__label" for="{{ form.address.id_for_label }}">Adresse</label>
+            {{ form.address }}
+            {% if form.address.errors %}<p class="form__errors">{{ form.address.errors|striptags }}</p>{% endif %}
+          </div>
+
+          <div class="form__row {% if form.city.errors %}is-error{% endif %}">
+            <label class="form__label" for="{{ form.city.id_for_label }}">Ville</label>
+            {{ form.city }}
+            {% if form.city.errors %}<p class="form__errors">{{ form.city.errors|striptags }}</p>{% endif %}
+          </div>
+
+          <div class="form__row {% if form.country.errors %}is-error{% endif %}">
+            <label class="form__label" for="{{ form.country.id_for_label }}">Pays</label>
+            {{ form.country }}
+            {% if form.country.errors %}<p class="form__errors">{{ form.country.errors|striptags }}</p>{% endif %}
+          </div>
+
+          <!-- Phone-->
+          <div class="form__row {% if form.phone_number.errors %}is-error{% endif %}">
+            <label class="form__label" for="{{ form.phone_number.id_for_label }}">Téléphone <span class="form__required">*</span></label>
+            {{ form.phone_number }}
+            {% if form.phone_number.errors %}<p class="form__errors">{{ form.phone_number.errors|striptags }}</p>{% endif %}
+            {% if form.phone_number.help_text %}<p class="form__help">{{ form.phone_number.help_text }}</p>{% endif %}
+          </div>
+
+          <!-- Newsletter -->
+          <div class="form__row span-full form__row--checkbox {% if form.newsletter_subscription.errors %}is-error{% endif %}">
+            <label for="{{ form.newsletter_subscription.id_for_label }}">
+              {{ form.newsletter_subscription }} S’abonner à la newsletter
+            </label>
+            {% if form.newsletter_subscription.errors %}<p class="form__errors">{{ form.newsletter_subscription.errors|striptags }}</p>{% endif %}
+          </div>
+        </div>
+
+        <footer class="account__foot">
+          <button type="submit" class="btn btn--primary">Créer mon compte</button>
+          <a href="{% url 'login' %}" class="btn btn--ghost">J’ai déjà un compte</a>
+          <input type="hidden" name="next" value="{{ next }}">
+        </footer>
+      </form>
+    </div>
+  </div>
+</section>
 {% endblock %}
