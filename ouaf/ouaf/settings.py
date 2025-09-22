@@ -37,6 +37,28 @@ DEBUG = os.getenv("DEBUG", "True").lower() in ("1", "true", "yes", "on")
 # ALLOWED_HOSTS = ['*']
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost").split(",")
 
+
+
+
+# MAIL
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.getenv("SMTP_HOST")
+EMAIL_PORT = int(os.getenv("SMTP_PORT", "587"))
+EMAIL_HOST_USER = os.getenv("SMTP_USER")
+EMAIL_HOST_PASSWORD = os.getenv("SMTP_PASSWORD")
+EMAIL_USE_TLS = os.getenv("SMTP_USE_TLS", "true").lower() in ("1","true","yes","on")
+EMAIL_USE_SSL = os.getenv("SMTP_USE_SSL", "false").lower() in ("1","true","yes","on")
+EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "10"))
+
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "no-reply@lessouriresdhindi.fr")
+SERVER_EMAIL = os.getenv("SERVER_EMAIL", DEFAULT_FROM_EMAIL)
+EMAIL_SUBJECT_PREFIX = os.getenv("EMAIL_SUBJECT_PREFIX", "[OUAF] ")
+
+
+
+
+
 # Application definition
 
 INSTALLED_APPS = [
