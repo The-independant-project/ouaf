@@ -15,14 +15,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include, re_path
+from django.urls import path, include, re_path, reverse_lazy
 from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.static import serve
 from django.views.i18n import JavaScriptCatalog
 from django.conf.urls.i18n import i18n_patterns
-
+from django.contrib.auth import views as auth_views
 
 
 urlpatterns = [
@@ -36,6 +36,14 @@ urlpatterns = [
 
 urlpatterns += i18n_patterns(
     path("admin/", admin.site.urls),
+    path(
+        "account/reset/<uidb64>/<token>/",
+        auth_views.PasswordResetConfirmView.as_view(
+            template_name="registration/password_reset_confirm.html",
+            success_url=reverse_lazy("password_reset_complete"),
+        ),
+        name="password_reset_confirm",
+    ),
     path("", include("ouaf_app.urls")),
     path("backoffice/", include('ouaf_backoffice_app.urls')),
     prefix_default_language=True,
