@@ -25,6 +25,13 @@ class Person(AbstractUser):
     is_active
     date_joined
     """
+    email = models.EmailField(
+        _("email address"),
+        unique=True,
+        error_messages={
+            "unique": _("Un utilisateur avec cet email existe déjà."),
+        },
+    )
     address = models.CharField(_("Adresse"), max_length=1000)
     city = models.CharField(_("Ville"), max_length=100)
     country = models.CharField(_("Pays"), max_length=100)
