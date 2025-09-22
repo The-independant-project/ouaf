@@ -62,14 +62,14 @@ EMAIL_SUBJECT_PREFIX = os.getenv("EMAIL_SUBJECT_PREFIX", "[OUAF] ")
 # Application definition
 
 INSTALLED_APPS = [
+    'ouaf_app',
+    'ouaf_backoffice_app',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'ouaf_app',
-    'ouaf_backoffice_app',
 ]
 
 if DEBUG:

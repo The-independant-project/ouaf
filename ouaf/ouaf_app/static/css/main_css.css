@@ -1394,3 +1394,132 @@ body.no-scroll {
 
 
 
+/* ===============================
+   LOGIN – carte + champs (flex)
+   =============================== */
+
+/* Carte du login (haut de carte) */
+main form[action*="login"]{
+  max-width: 640px;
+  margin: clamp(1.5rem, 4vw, 3rem) auto 0;
+  background: #fff;
+  border: 1px solid var(--clr-primary-dark);
+  border-radius: var(--radius) var(--radius) 0 0; /* coins du haut */
+  box-shadow: 0 10px 24px rgba(0,0,0,.05);
+  padding: 1.25rem;
+}
+
+/* Table -> flex rows (sans changer le HTML) */
+main form[action*="login"] table{
+  display: block;
+  width: 100%;
+  margin: 0 0 var(--space-4);
+}
+main form[action*="login"] tr{
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .35rem 0;              /* espacement vertical entre lignes */
+  border-bottom: 0;               /* pas de bordures parasites */
+}
+main form[action*="login"] td{
+  display: block;
+}
+
+/* Colonne label (1ère cellule) + colonne champ (2e cellule) */
+main form[action*="login"] td:first-child{
+  flex: 0 0 40%;
+  min-width: 180px;
+  padding-right: 1rem;
+  font-weight: 600;
+  color: var(--clr-ink);
+  white-space: nowrap;
+}
+main form[action*="login"] td:last-child{
+  flex: 1 1 auto;
+}
+
+/* Inputs (cohérents avec .account) */
+main form[action*="login"] input[type="text"],
+main form[action*="login"] input[type="email"],
+main form[action*="login"] input[type="password"]{
+  width: 100%;
+  padding: .6rem .7rem;
+  border: 1px solid var(--clr-primary-dark);
+  border-radius: calc(var(--radius) - 4px);
+  background: #fff;
+  color: var(--clr-ink);
+  font: inherit;
+  box-sizing: border-box;
+}
+main form[action*="login"] input:focus{
+  outline: none;
+  border-color: var(--clr-accent);
+  box-shadow: 0 0 0 3px rgba(47,111,118,.15);
+}
+
+/* Bouton de soumission à l’intérieur de la carte */
+main form[action*="login"] input[type="submit"]{
+  margin-top: .25rem;
+}
+
+/* Footer de la carte : le lien "Mot de passe oublié ?" fusionne visuellement */
+main form[action*="login"] + a.btn{
+  display: block;
+  max-width: 640px;
+  margin: 0 auto clamp(1rem, 3vw, 1.5rem);
+  padding: .85rem 1rem;
+  text-align: center;
+
+  background: var(--clr-footer-bg);
+  border: 1px solid var(--clr-primary-dark);
+  border-top: 0; /* fusion avec la carte au-dessus */
+  border-radius: 0 0 var(--radius) var(--radius); /* coins bas */
+}
+main form[action*="login"] + a.btn:hover,
+main form[action*="login"] + a.btn:focus{
+  text-decoration: none;
+  filter: brightness(.98);
+}
+
+/* Messages d’info/erreur au-dessus (tes <p>) */
+main > p{
+  max-width: 640px;
+  margin: .75rem auto;
+  padding: .6rem .8rem;
+  border: 1px dashed var(--clr-primary-dark);
+  border-radius: calc(var(--radius) - 4px);
+  background: #fffdfc;
+  color: var(--clr-ink);
+}
+
+/* Mobile: empile label au-dessus du champ */
+@media (max-width: 560px){
+  main form[action*="login"] tr{
+    flex-direction: column;
+    align-items: stretch;
+    gap: .35rem;
+  }
+  main form[action*="login"] td:first-child{
+    flex: 0 0 auto;
+    min-width: 0;
+    padding-right: 0;
+  }
+  main form[action*="login"] td:last-child{
+    flex: 0 0 auto;
+  }
+}
+
+
+.form--onecol .formGrid { grid-template-columns: 1fr !important; }
+
+.form--onecol .helptext {
+  color: var(--clr-muted);
+  font-size: .9rem;
+  line-height: 1.45;
+  margin-top: .25rem;
+}
+.form--onecol .helptext ul { margin: .25rem 0 0; padding-left: 1.1rem; }
+.form--onecol .helptext li { margin: .1rem 0; }
+
+
