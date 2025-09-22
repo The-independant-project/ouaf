@@ -1,23 +1,34 @@
 <form id="catForm" method="post" enctype="multipart/form-data"
       action="{% url 'backoffice:activity_category_modal' %}">
-  {% csrf_token %}
+    {% csrf_token %}
 
-  <div class="formGrid">
-    <div class="form__row span-full">
-      <label class="form__label" for="{{ form.title.id_for_label }}">Titre <span class="form__required">*</span></label>
-      {{ form.title }}
-      {% if form.title.errors %}<div class="form__errors">{{ form.title.errors }}</div>{% endif %}
+    <div class="formGrid">
+        <div class="form__row span-full">
+            <label class="form__label" for="{{ form.title.id_for_label }}">Titre <span
+                    class="form__required">*</span></label>
+            {{ form.title }}
+            {% if form.title.errors %}
+                <div class="form__errors">{{ form.title.errors }}</div>{% endif %}
+        </div>
+
+        {# wrapper + ratio #}
+        <div class="form__row span-full js-crop-scope" data-crop-aspect="16/9" data-crop-size="1600x900">
+            <label class="form__label" for="{{ form.image.id_for_label }}">Image</label>
+            <div class="form__input">
+                {{ form.image }}
+                <div style="margin-top:.5rem;">
+                    <img class="media_form__preview_content js-media-preview"
+                         alt="Prévisualisation"
+                         style="display:none;max-width:180px;border:1px solid var(--clr-primary-dark);border-radius:var(--radius);"/>
+                </div>
+            </div>
+            {% if form.image.errors %}
+                <div class="form__errors">{{ form.image.errors }}</div>{% endif %}
+        </div>
     </div>
 
-    <div class="form__row span-full">
-      <label class="form__label" for="{{ form.image.id_for_label }}">Image</label>
-      {{ form.image }}
-      {% if form.image.errors %}<div class="form__errors">{{ form.image.errors }}</div>{% endif %}
-    </div>
-  </div>
-
-  <footer class="account__foot">
-    <button type="button" class="btn btn--ghost" data-close-modal>Annuler</button>
-    <button type="submit" class="btn btn--primary">Créer</button>
-  </footer>
+    <footer class="account__foot">
+        <button type="button" class="btn btn--ghost" data-close-modal>Annuler</button>
+        <button type="submit" class="btn btn--primary">Créer</button>
+    </footer>
 </form>

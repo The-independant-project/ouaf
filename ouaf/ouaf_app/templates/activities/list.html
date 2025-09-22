@@ -6,41 +6,22 @@
 {% block content %}
 <section class="team" aria-labelledby="activities-title">
   <header class="team__header">
-    <h1 id="activities-title">Activités</h1>
-    <p class="team__bio" style="max-width:60ch;margin:0.5rem auto 0;">
+    {% include "html/ouaf_h1.html" with text="Activités" %}
+    <p class="team__intro">
       Choisissez une catégorie pour découvrir les activités proposées.
     </p>
   </header>
 
   {% if categories %}
-    <ul class="team__list" role="list" style="grid-template-columns: repeat(3, 1fr);">
+    <ul class="team__list" role="list">
       {% for cat in categories %}
-        <li class="team__card" style="width:100%;">
-          <a href="{% url 'activities_by_category' cat.pk %}"
-             class="categoryCard"
-             style="
-               display:block;
-               width:100%;
-               aspect-ratio: 16 / 9;
-               border-radius: var(--radius);
-               overflow:hidden;
-               border: 3px solid var(--clr-primary);
-               box-shadow: 0 6px 18px rgba(0,0,0,.08);
-               text-decoration:none;
-               position:relative;
-               background: #eee url({% if cat.image %}{{ cat.image.url }}{% else %}{% static 'images/avatar_placeholder.svg' %}{% endif %}) center/cover no-repeat;
-             ">
-            <span style="
-              position:absolute;
-              inset:auto 0 0 0;
-              background: linear-gradient(transparent, rgba(0,0,0,.55));
-              color: #fff;
-              padding: .75rem 1rem;
-              font-weight:700;
-              letter-spacing:.2px;
-            ">
-              {{ cat.title }}
-            </span>
+        <li class="team__card">
+          <a href="{% url 'activities_by_category' cat.pk %}" class="categoryCard">
+            <img
+              class="categoryCard__img"
+              src="{% if cat.image %}{{ cat.image.url }}{% else %}{% static 'images/avatar_placeholder.svg' %}{% endif %}"
+              alt="{{ cat.title }}">
+            <span class="categoryCard__title">{{ cat.title }}</span>
           </a>
         </li>
       {% endfor %}

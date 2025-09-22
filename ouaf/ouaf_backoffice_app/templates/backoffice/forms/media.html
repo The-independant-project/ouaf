@@ -5,10 +5,11 @@
 
     <div class="media_form__data">
         <strong>Informations:</strong>
-        <div class="media_form__row">
+
+        <div class="media_form__row js-crop-scope" data-crop-aspect="16/9" data-crop-size="1600x900">
             <label class="media_form__label" for="{{ form.file.id_for_label }}">Fichier</label>
             <div class="media_form__input">
-            {{ form.file }}
+                {{ form.file }}
             </div>
         </div>
 
@@ -46,16 +47,20 @@
         {% if form.instance.file %}
             <strong>Prévisualisation:</strong>
             <br/>
-            <img class="media_form__preview_content" src="{{ form.instance.file.url }}" alt="Prévisualisation"/>
+            <img class="media_form__preview_content js-media-preview" src="{{ form.instance.file.url }}" alt="Prévisualisation"/>
         {% elif form.instance.url and "youtu" in form.instance.url %}
             <strong>Prévisualisation:</strong>
             <br/>
             <div class="media_form__preview_content">
-            <button type="button" data-yt="{{ form.instance.url }}"
-                    aria-label="Lire la vidéo YouTube"
-                    class="yt-thumb js-yt-thumb"
-                    style="--yt-thumb: url({{ form.instance.url }});">::after</button>
+                <button type="button" data-yt="{{ form.instance.url }}"
+                        aria-label="Lire la vidéo YouTube"
+                        class="yt-thumb js-yt-thumb"
+                        style="--yt-thumb: url({{ form.instance.url }});">::after</button>
             </div>
+        {% else %}
+            <strong>Prévisualisation:</strong>
+            <br/>
+            <img class="media_form__preview_content js-media-preview" alt="Prévisualisation" style="display:none;"/>
         {% endif %}
     </div>
 
@@ -67,6 +72,19 @@
         {% endif %}
         {% endfor %}
     </div>
+
+    <!-- AJOUT: initialise les attributs sur l'input file rendu -->
+    <script>
+      (function(root){
+        try{
+          const scope = root.querySelector('.js-crop-scope');
+          const input = scope && scope.querySelector('input[type="file"]');
+          if(!input) return;
+          input.setAttribute('data-autocrop','1');
+          input.setAttribute('accept','image/*');
+        }catch(e){}
+      })(document.currentScript.closest('.media_form__element'));
+    </script>
 
     <script>
         // Pose les miniatures au DOMContentLoaded

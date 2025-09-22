@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Nouvelle activité – Backoffice{% endblock %}
 
+
 {% block content %}
     <section class="account" aria-labelledby="activity-form-title">
         <div class="account__card">
@@ -56,53 +57,44 @@
 
                 <h2 class="account__title" style="margin-top:1rem;">Médias</h2>
 
+                {% if media_formset.non_form_errors %}
+                    <div class="form__nonfield">{{ media_formset.non_form_errors }}</div>
+                {% endif %}
+
                 {{ media_formset.management_form }}
+
                 <div id="media-forms" class="formGrid">
                     {% for mf in media_formset %}
-                        <div class="form__row span-full"
-                             style="border:1px dashed var(--clr-primary-dark); padding:1rem; border-radius:var(--radius);">
-                            <p class="form__label"><strong>Média #{{ forloop.counter }}</strong></p>
-
-                            <div class="formGrid">
-                                <div class="form__row">
-                                    <label class="form__label" for="{{ mf.file.id_for_label }}">Fichier</label>
-                                    {{ mf.file }}
-                                </div>
-
-                                <div class="form__row">
-                                    <label class="form__label" for="{{ mf.url.id_for_label }}">URL</label>
-                                    {{ mf.url }}
-                                    <p class="form__help">Ex. image/vidéo distante ou URL YouTube.</p>
-                                </div>
-
-                                <div class="form__row">
-                                    <label class="form__label" for="{{ mf.caption.id_for_label }}">Légende</label>
-                                    {{ mf.caption }}
-                                </div>
-
-                                <div class="form__row">
-                                    <label class="form__label" for="{{ mf.position.id_for_label }}">Position</label>
-                                    {{ mf.position }}
-                                </div>
-
-                                {% if mf.DELETE %}
-                                    <div class="form__row">
-                                        <label class="form__label" for="{{ mf.DELETE.id_for_label }}">Supprimer</label>
-                                        {{ mf.DELETE }}
-                                    </div>
-                                {% endif %}
-                            </div>
-
-                            {% if mf.non_field_errors %}
-                                <div class="form__errors">{{ mf.non_field_errors }}</div>
-                            {% endif %}
-                        </div>
+                        {{ mf }}
                     {% endfor %}
+                </div>
+
+                <div id="empty-form" style="display:none;">
+                    {{ media_formset.empty_form }}
                 </div>
 
                 <div style="margin-top:.75rem;">
                     <button type="button" class="btn btn--ghost" id="add-media">+ Ajouter un média</button>
                 </div>
+
+                <script>
+                    (function () {
+                        const prefix = "{{ media_formset.management_form.prefix }}";
+                        const total = document.getElementById(`id_${prefix}-TOTAL_FORMS`);
+                        const list = document.getElementById('media-forms');
+                        const tpl = document.getElementById('empty-form').innerHTML;
+
+                        document.getElementById('add-media')?.addEventListener('click', () => {
+                            const idx = parseInt(total.value, 10);
+                            const html = tpl.replaceAll('__prefix__', idx);
+                            const wrap = document.createElement('div');
+                            wrap.innerHTML = html;
+                            list.appendChild(wrap.firstElementChild);
+                            total.value = idx + 1;
+                        });
+                    })();
+                </script>
+
 
                 <footer class="account__foot">
                     <a class="btn btn--ghost" href="{% url 'backoffice:activity_list' %}">Annuler</a>
