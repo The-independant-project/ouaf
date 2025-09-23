@@ -54,6 +54,9 @@ EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "10"))
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "no-reply@lessouriresdhindi.fr")
 SERVER_EMAIL = os.getenv("SERVER_EMAIL", DEFAULT_FROM_EMAIL)
 EMAIL_SUBJECT_PREFIX = os.getenv("EMAIL_SUBJECT_PREFIX", "[OUAF] ")
+CONTACT_RECIPIENTS = [
+    e.strip() for e in os.getenv("CONTACT_RECIPIENTS", DEFAULT_FROM_EMAIL).split(",") if e.strip()
+]
 
 
 
