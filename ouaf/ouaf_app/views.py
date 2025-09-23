@@ -171,12 +171,13 @@ class ContactView(FormView):
                 messages.error(request, "Trop de tentatives. Réessayez dans quelques minutes.")
                 return HttpResponse("Rate limit exceeded", status=429)
 
-            added = cache.add(key, 1, timeout=self.RATE_LIMIT_WINDOW)
-            if not added:
+            if current > 0:
                 try:
                     cache.incr(key)
                 except Exception:
                     cache.set(key, current + 1, timeout=self.RATE_LIMIT_WINDOW)
+            else:
+                cache.add(key, 1, timeout=self.RATE_LIMIT_WINDOW)
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -199,7 +200,7 @@ class ContactView(FormView):
         html = render_to_string("emails/contact_to_org.html", ctx)
         text = strip_tags(html)
 
-        to_recipients = getattr(settings, "CONTACT_RECIPIENTS", [settings.DEFAULT_FROM_EMAIL])
+        to_recipients = settings.CONTACT_RECIPIENTS
 
         org_msg = EmailMultiAlternatives(
             subject=subject,
