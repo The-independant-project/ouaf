@@ -4,7 +4,7 @@ from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import login_required, login_not_required
 from django.urls import reverse_lazy
 from django.views.generic import ListView, FormView
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from .forms import PersonForm, RegistrationForm, ContactForm
 from .models import OrganisationChartEntry, Activity, ActivityCategory, Animal, AnimalMedia
 from django.contrib import messages
@@ -15,6 +15,7 @@ from django.utils.html import strip_tags
 from django.template.loader import render_to_string
 import logging
 import uuid
+from django.core.cache import cache
 
 
 def index(request):
@@ -96,26 +97,6 @@ class ActivitiesByCategoryView(ListView):
 logger = logging.getLogger(__name__)
 
 
-def _safe_subject(text: str, max_len: int = 140) -> str:
-    """
-    Sanitize an email subject line for safe usage in SMTP headers.
-
-    Ensures:
-        - No CR/LF injection (removes line breaks).
-        - Single-line subject with leading/trailing spaces trimmed.
-        - Maximum length enforced (default: 140 characters).
-
-    Args:
-        text (str): The raw subject line text (possibly user-provided).
-        max_len (int, optional): Maximum length allowed for the subject.
-                                 Defaults to 140.
-
-    Returns:
-        str: A sanitized and truncated subject line safe for email headers.
-    """
-    s = " ".join(str(text).splitlines()).strip()
-    return s[:max_len]
-
 
 class ContactView(FormView):
     """
@@ -154,15 +135,48 @@ class ContactView(FormView):
     template_name = "contact/contact.html"
     form_class = ContactForm
 
+    RATE_LIMIT_MAX = 5         # 5 submit
+    RATE_LIMIT_WINDOW = 15*60  # 15 minutes
+
     def get_success_url(self):
         return reverse_lazy("contact")
+
+    def _client_ip(self) -> str:
+        xff = self.request.META.get("HTTP_X_FORWARDED_FOR")
+        if xff:
+            return xff.split(",")[0].strip()
+        return self.request.META.get("REMOTE_ADDR", "0.0.0.0")
+
+    def dispatch(self, request, *args, **kwargs):
+        # Rate-limit avant toute validation
+        if request.method == "POST":
+            ip = self._client_ip()
+            key = f"contact_rl:{ip}"
+            current = cache.get(key, 0)
+
+            if current >= self.RATE_LIMIT_MAX:
+                messages.error(request, "Trop de tentatives. Réessayez dans quelques minutes.")
+                return HttpResponse("Rate limit exceeded", status=429)
+
+            # incrément + TTL
+            added = cache.add(key, 1, timeout=self.RATE_LIMIT_WINDOW)
+            if not added:
+                try:
+                    cache.incr(key)
+                except Exception:
+                    cache.set(key, current + 1, timeout=self.RATE_LIMIT_WINDOW)
+
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         data = form.cleaned_data
         req_id = str(uuid.uuid4())
 
-        subject = _safe_subject(f"{getattr(settings, 'EMAIL_SUBJECT_PREFIX', '')}[Contact] "
-                                f"{data['first_name']} {data['last_name']}")
+        # ---- email vers l’asso ----
+        subject = self._safe_subject(
+            f"{getattr(settings, 'EMAIL_SUBJECT_PREFIX', '')}[Contact] "
+            f"{data['first_name']} {data['last_name']}"
+        )
         ctx = {
             "first_name": data["first_name"],
             "last_name": data["last_name"],
@@ -192,11 +206,11 @@ class ContactView(FormView):
                         extra={"request_id": req_id, "to": to_recipients, "result": sent})
         except Exception:
             logger.exception("Contact email failed", extra={"request_id": req_id})
-            messages.error(self.request,
-                           "Désolé, l’envoi a échoué. Merci de réessayer dans quelques minutes.")
+            messages.error(self.request, "Désolé, l’envoi a échoué. Merci de réessayer dans quelques minutes.")
             return self.form_invalid(form)
 
-        ack_subject = _safe_subject("Nous avons bien reçu votre message")
+        # ---- ACK à l’émetteur (best-effort) ----
+        ack_subject = self._safe_subject("Nous avons bien reçu votre message")
         ack_ctx = {"first_name": data["first_name"], "request_id": req_id}
         ack_html = render_to_string("emails/contact_ack.html", ack_ctx)
         ack_text = strip_tags(ack_html)
@@ -215,9 +229,29 @@ class ContactView(FormView):
         except Exception:
             logger.exception("Contact ACK failed", extra={"request_id": req_id})
 
-        messages.success(self.request,
-                         "Merci ! Votre message a bien été envoyé. Nous vous répondrons au plus vite.")
+        messages.success(self.request, "Merci ! Votre message a bien été envoyé. Nous vous répondrons au plus vite.")
         return super().form_valid(form)
+
+    @staticmethod
+    def _safe_subject(text: str, max_len: int = 140) -> str:
+        """
+        Sanitize an email subject line for safe usage in SMTP headers.
+
+        Ensures:
+            - No CR/LF injection (removes line breaks).
+            - Single-line subject with leading/trailing spaces trimmed.
+            - Maximum length enforced (default: 140 characters).
+
+        Args:
+            text (str): The raw subject line text (possibly user-provided).
+            max_len (int, optional): Maximum length allowed for the subject.
+                                     Defaults to 140.
+
+        Returns:
+            str: A sanitized and truncated subject line safe for email headers.
+        """
+        s = " ".join(str(text).splitlines()).strip()
+        return s[:max_len]
 
 
 def animal_list(request):
