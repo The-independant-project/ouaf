@@ -21,6 +21,11 @@
         <form method="post" class="contactForm" novalidate>
             {% csrf_token %}
 
+            {{ form.honeypot }}
+            {{ form.ts }}
+
+
+
             {% if form.non_field_errors %}
                 <div class="contactForm__nonfield">
                     {% for err in form.non_field_errors %}<p>{{ err }}</p>{% endfor %}
