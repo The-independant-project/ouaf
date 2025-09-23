@@ -97,46 +97,60 @@ class ActivitiesByCategoryView(ListView):
 logger = logging.getLogger(__name__)
 
 
-
 class ContactView(FormView):
     """
-    Handle the contact form workflow: send email to the organization and
-    return an acknowledgment to the user.
+    Handle the contact form workflow: validate input, apply anti-abuse protections,
+    and send emails to both the organization and the user.
 
     Workflow:
-        1. Validate the form (first/last name, email, phone, message).
-        2. Send a formatted email with details to the organization inbox.
-        3. Send an acknowledgment (ACK) email to the user confirming receipt.
-        4. Provide success/error feedback through Django messages.
+        1. Apply per-IP rate limiting to prevent abuse (default: 5 submissions per 15 min).
+        2. Validate the form (first/last name, email, phone, message, spam fields).
+        3. Generate a unique request ID (UUID) for correlation and logging.
+        4. Send a formatted email with details to the organization inbox.
+        5. Send an acknowledgment (ACK) email to the user confirming receipt.
+        6. Provide success or error feedback through Django messages.
 
     Features:
-        - Generates a unique request ID (UUID) for correlation and logging.
-        - Protects email headers by sanitizing subject lines.
-        - Uses both plain text and HTML alternatives for better email client support.
-        - Logs errors and prevents UX disruption if the ACK email fails.
+        - Rate limiting based on client IP address (stored in cache).
+        - Sanitized subject lines to prevent header injection attacks.
+        - Dual format emails (plain text + HTML) for maximum compatibility.
+        - Separate templates for organization and acknowledgment messages.
+        - Robust error handling: logs failures and prevents UX disruption if
+          acknowledgment email delivery fails.
+        - Custom headers (e.g., X-Contact-Request-ID) for traceability.
 
-    Template:
-        - contact/contact.html (form rendering).
-        - emails/contact_to_org.html (HTML email to organization).
-        - emails/contact_ack.html (HTML acknowledgment to user).
+    Templates:
+        - contact/contact.html: Form rendering.
+        - emails/contact_to_org.html: HTML email to organization.
+        - emails/contact_ack.html: HTML acknowledgment to user.
 
     Success URL:
-        Redirects back to the "contact" page.
+        Redirects back to the "contact" page after successful submission.
 
     Attributes:
         template_name (str): Path to the contact form template.
         form_class (ContactForm): Form used for validation and cleaned data.
+        RATE_LIMIT_MAX (int): Maximum number of allowed submissions per IP.
+        RATE_LIMIT_WINDOW (int): Rate limit window duration (seconds).
 
     Methods:
-        get_success_url(): Return redirect URL after success.
-        form_valid(form): Process valid form submission, handle email sending,
-                          logging, and user feedback.
+        get_success_url():
+            Return redirect URL after success.
+        _client_ip():
+            Extract the client IP address from request headers.
+        dispatch(request, *args, **kwargs):
+            Apply rate limiting before dispatching the request.
+        form_valid(form):
+            Process valid form submission, handle email sending, logging,
+            and user feedback.
+        _safe_subject(text, max_len=140):
+            Sanitize and truncate subject lines for safe usage in SMTP headers.
     """
     template_name = "contact/contact.html"
     form_class = ContactForm
 
-    RATE_LIMIT_MAX = 5         # 5 submit
-    RATE_LIMIT_WINDOW = 15*60  # 15 minutes
+    RATE_LIMIT_MAX = 5  # 5 submit
+    RATE_LIMIT_WINDOW = 15 * 60  # 15 minutes
 
     def get_success_url(self):
         return reverse_lazy("contact")
@@ -148,7 +162,6 @@ class ContactView(FormView):
         return self.request.META.get("REMOTE_ADDR", "0.0.0.0")
 
     def dispatch(self, request, *args, **kwargs):
-        # Rate-limit avant toute validation
         if request.method == "POST":
             ip = self._client_ip()
             key = f"contact_rl:{ip}"
@@ -158,7 +171,6 @@ class ContactView(FormView):
                 messages.error(request, "Trop de tentatives. Réessayez dans quelques minutes.")
                 return HttpResponse("Rate limit exceeded", status=429)
 
-            # incrément + TTL
             added = cache.add(key, 1, timeout=self.RATE_LIMIT_WINDOW)
             if not added:
                 try:
@@ -172,7 +184,6 @@ class ContactView(FormView):
         data = form.cleaned_data
         req_id = str(uuid.uuid4())
 
-        # ---- email vers l’asso ----
         subject = self._safe_subject(
             f"{getattr(settings, 'EMAIL_SUBJECT_PREFIX', '')}[Contact] "
             f"{data['first_name']} {data['last_name']}"
@@ -209,7 +220,6 @@ class ContactView(FormView):
             messages.error(self.request, "Désolé, l’envoi a échoué. Merci de réessayer dans quelques minutes.")
             return self.form_invalid(form)
 
-        # ---- ACK à l’émetteur (best-effort) ----
         ack_subject = self._safe_subject("Nous avons bien reçu votre message")
         ack_ctx = {"first_name": data["first_name"], "request_id": req_id}
         ack_html = render_to_string("emails/contact_ack.html", ack_ctx)
