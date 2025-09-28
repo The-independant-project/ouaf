@@ -225,4 +225,99 @@
             });
         });
     </script>
+
+
+
+
+    <script>
+        /**
+         * Clamp .activities__desc to fit under the media height (desktop only).
+         * Keeps the image anchored; only the text expands/collapses.
+         */
+        (() => {
+            const rows = document.querySelectorAll('.activities__row');
+            const mq = window.matchMedia('(max-width: 768px)');
+
+            const debounce = (fn, d = 120) => {
+                let t;
+                return (...a) => {
+                    clearTimeout(t);
+                    t = setTimeout(() => fn(...a), d);
+                };
+            };
+
+            function clampRow(row) {
+                const media = row.querySelector('.activities__media');
+                const content = row.querySelector('.activities__content');
+                const title = row.querySelector('.activities__title');
+                const desc = row.querySelector('.activities__desc');
+                if (!media || !content || !desc) return;
+
+                // In stacked layout (mobile), remove dynamic clamp.
+                if (mq.matches) {
+                    content.classList.remove('is-clamped', 'is-expanded');
+                    desc.style.removeProperty('--line-clamp');
+                    const b = content.querySelector('.activities__moreBtn');
+                    if (b) b.remove();
+                    return;
+                }
+
+                // Compute how many lines fit under the media height.
+                const mediaH = media.clientHeight;
+                const titleH = title ? title.clientHeight : 0;
+                const gap = parseFloat(getComputedStyle(content).rowGap || 0);
+                const avail = Math.max(0, mediaH - titleH - gap);
+                const lineH = parseFloat(getComputedStyle(desc).lineHeight) || 24;
+                const lines = Math.max(2, Math.floor(avail / lineH));
+
+                content.classList.add('is-clamped');
+                content.classList.remove('is-expanded');
+                desc.style.setProperty('--line-clamp', String(lines));
+
+                // Show toggle only when overflow actually occurs.
+                requestAnimationFrame(() => {
+                    const needs = desc.scrollHeight > desc.clientHeight + 1;
+                    let btn = content.querySelector('.activities__moreBtn');
+
+                    if (needs) {
+                        if (!btn) {
+                            btn = document.createElement('button');
+                            btn.type = 'button';
+                            btn.className = 'activities__moreBtn';
+                            btn.textContent = 'Voir plus';
+                            btn.addEventListener('click', () => {
+                                const expanded = content.classList.toggle('is-expanded');
+                                btn.textContent = expanded ? 'Voir moins' : 'Voir plus';
+                            });
+                            content.appendChild(btn);
+                        }
+                        btn.hidden = false;
+                    } else if (btn) {
+                        btn.hidden = true;
+                    }
+                });
+            }
+
+            function runAll() {
+                rows.forEach(clampRow);
+            }
+
+            // Recompute on load and on resize (debounced).
+            window.addEventListener('load', runAll);
+            window.addEventListener('resize', debounce(runAll, 120));
+
+            // Recompute once media (images) load, in case sizes change after onload.
+            rows.forEach(row => {
+                const img = row.querySelector('.activities__media img');
+                if (img) {
+                    if (img.complete) return;          // already loaded
+                    img.addEventListener('load', runAll, {once: true});
+                }
+            });
+        })();
+    </script>
+
+
+
+
 {% endblock %}
