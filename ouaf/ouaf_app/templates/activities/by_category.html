@@ -110,6 +110,19 @@
         </ul>
     </section>
 
+    <!-- Image Modal (lightbox) -->
+    <div class="mediaModal js-media-modal" role="dialog" aria-modal="true" aria-label="Agrandissement d'image" hidden>
+        <div class="mediaModal__dialog">
+            <button type="button" class="mediaModal__btn mediaModal__prev" aria-label="Image précédente">‹</button>
+            <div class="mediaModal__imgWrap">
+                <img class="mediaModal__img" alt="">
+            </div>
+            <button type="button" class="mediaModal__btn mediaModal__next" aria-label="Image suivante">›</button>
+            <button type="button" class="mediaModal__btn mediaModal__close" aria-label="Fermer">✕</button>
+        </div>
+    </div>
+
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.js-yt-embed').forEach(el => {
@@ -317,6 +330,134 @@
         })();
     </script>
 
+
+    <script>
+        /**
+         * Lightweight image modal for carousel images.
+         * - Opens when clicking an image inside .mediaCarousel of a row
+         * - Keyboard: Esc (close), ←/→ (nav), Tab trap within controls
+         * - Restores focus to the opener, body scroll locked while open
+         */
+        (() => {
+            const modal = document.querySelector('.js-media-modal');
+            if (!modal) return;
+
+            const imgEl = modal.querySelector('.mediaModal__img');
+            const btnPrev = modal.querySelector('.mediaModal__prev');
+            const btnNext = modal.querySelector('.mediaModal__next');
+            const btnClose = modal.querySelector('.mediaModal__close');
+
+            let gallery = [];
+            let index = 0;
+            let opener = null;
+            let lastFocused = null;
+
+            function collectImagesFromRow(row) {
+                const set = new Set();
+                const list = [];
+                row.querySelectorAll('.activities__carousel .mediaCarousel__slide img').forEach(img => {
+                    const src = img.getAttribute('src');
+                    if (src && !set.has(src)) {
+                        set.add(src);
+                        list.push({src, alt: img.getAttribute('alt') || ''});
+                    }
+                });
+                return list;
+            }
+
+            function render() {
+                const item = gallery[index];
+                if (!item) return;
+                imgEl.src = item.src;
+                imgEl.alt = item.alt;
+                const next = new Image();
+                next.src = gallery[(index + 1) % gallery.length]?.src || '';
+                const prev = new Image();
+                prev.src = gallery[(index - 1 + gallery.length) % gallery.length]?.src || '';
+            }
+
+            function openWith(list, startIdx, trigger) {
+                gallery = list.slice();
+                index = Math.max(0, Math.min(startIdx || 0, gallery.length - 1));
+                opener = trigger || null;
+                lastFocused = document.activeElement;
+
+                render();
+                modal.hidden = false;
+                modal.classList.add('is-open');
+                document.body.style.overflow = 'hidden';
+                // initial focus
+                btnClose.focus();
+                // Click outside image closes
+                modal.addEventListener('click', backdropClose, {once: true, capture: true});
+                document.addEventListener('keydown', onKey);
+            }
+
+            function close() {
+                modal.classList.remove('is-open');
+                modal.hidden = true;
+                document.body.style.overflow = '';
+                document.removeEventListener('keydown', onKey);
+                if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+            }
+
+            function next() {
+                index = (index + 1) % gallery.length;
+                render();
+            }
+
+            function prev() {
+                index = (index - 1 + gallery.length) % gallery.length;
+                render();
+            }
+
+            function onKey(e) {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    close();
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    next();
+                } else if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    prev();
+                } else if (e.key === 'Tab') {
+                    const nodes = [btnPrev, btnNext, btnClose].filter(Boolean);
+                    const i = nodes.indexOf(document.activeElement);
+                    const dir = e.shiftKey ? -1 : 1;
+                    const ni = (i + dir + nodes.length) % nodes.length;
+                    e.preventDefault();
+                    nodes[ni].focus();
+                }
+            }
+
+            function backdropClose(e) {
+                const dialog = modal.querySelector('.mediaModal__dialog');
+                if (!dialog.contains(e.target)) close();
+            }
+
+            // Wire buttons
+            btnPrev.addEventListener('click', prev);
+            btnNext.addEventListener('click', next);
+            btnClose.addEventListener('click', close);
+
+            // Delegate: open on image click inside each row's carousel
+            document.querySelectorAll('.activities__row').forEach(row => {
+                const container = row.querySelector('.mediaCarousel');
+                if (!container) return;
+
+                container.addEventListener('click', (evt) => {
+                    const img = evt.target.closest('img');
+                    if (!img) return; // ignore clicks on videos/links
+                    const list = collectImagesFromRow(row);
+                    if (!list.length) return;
+
+                    const start = Math.max(0, list.findIndex(i => i.src === img.getAttribute('src')));
+                    openWith(list, start, img);
+                });
+            });
+        })();
+    </script>
 
 
 
