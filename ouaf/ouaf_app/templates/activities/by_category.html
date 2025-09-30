@@ -110,6 +110,19 @@
         </ul>
     </section>
 
+    <!-- Image Modal (lightbox) -->
+    <div class="mediaModal js-media-modal" role="dialog" aria-modal="true" aria-label="Agrandissement d'image" hidden>
+        <div class="mediaModal__dialog">
+            <button type="button" class="mediaModal__btn mediaModal__prev" aria-label="Image précédente">‹</button>
+            <div class="mediaModal__imgWrap">
+                <img class="mediaModal__img" alt="">
+            </div>
+            <button type="button" class="mediaModal__btn mediaModal__next" aria-label="Image suivante">›</button>
+            <button type="button" class="mediaModal__btn mediaModal__close" aria-label="Fermer">✕</button>
+        </div>
+    </div>
+
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.js-yt-embed').forEach(el => {
@@ -225,4 +238,221 @@
             });
         });
     </script>
+
+
+
+
+    <script>
+        /**
+         * Clamp .activities__desc to fit under the media height (desktop only).
+         * Keeps the image anchored; only the text expands/collapses.
+         */
+        (() => {
+            const rows = document.querySelectorAll('.activities__row');
+            const mq = window.matchMedia('(max-width: 768px)');
+
+            const debounce = (fn, d = 120) => {
+                let t;
+                return (...a) => {
+                    clearTimeout(t);
+                    t = setTimeout(() => fn(...a), d);
+                };
+            };
+
+            function clampRow(row) {
+                const media = row.querySelector('.activities__media');
+                const content = row.querySelector('.activities__content');
+                const title = row.querySelector('.activities__title');
+                const desc = row.querySelector('.activities__desc');
+                if (!media || !content || !desc) return;
+
+                // In stacked layout (mobile), remove dynamic clamp.
+                if (mq.matches) {
+                    content.classList.remove('is-clamped', 'is-expanded');
+                    desc.style.removeProperty('--line-clamp');
+                    const b = content.querySelector('.activities__moreBtn');
+                    if (b) b.remove();
+                    return;
+                }
+
+                // Compute how many lines fit under the media height.
+                const mediaH = media.clientHeight;
+                const titleH = title ? title.clientHeight : 0;
+                const gap = parseFloat(getComputedStyle(content).rowGap || 0);
+                const avail = Math.max(0, mediaH - titleH - gap);
+                const lineH = parseFloat(getComputedStyle(desc).lineHeight) || 24;
+                const lines = Math.max(2, Math.floor(avail / lineH));
+
+                content.classList.add('is-clamped');
+                content.classList.remove('is-expanded');
+                desc.style.setProperty('--line-clamp', String(lines));
+
+                // Show toggle only when overflow actually occurs.
+                requestAnimationFrame(() => {
+                    const needs = desc.scrollHeight > desc.clientHeight + 1;
+                    let btn = content.querySelector('.activities__moreBtn');
+
+                    if (needs) {
+                        if (!btn) {
+                            btn = document.createElement('button');
+                            btn.type = 'button';
+                            btn.className = 'activities__moreBtn';
+                            btn.textContent = 'Voir plus';
+                            btn.addEventListener('click', () => {
+                                const expanded = content.classList.toggle('is-expanded');
+                                btn.textContent = expanded ? 'Voir moins' : 'Voir plus';
+                            });
+                            content.appendChild(btn);
+                        }
+                        btn.hidden = false;
+                    } else if (btn) {
+                        btn.hidden = true;
+                    }
+                });
+            }
+
+            function runAll() {
+                rows.forEach(clampRow);
+            }
+
+            // Recompute on load and on resize (debounced).
+            window.addEventListener('load', runAll);
+            window.addEventListener('resize', debounce(runAll, 120));
+
+            // Recompute once media (images) load, in case sizes change after onload.
+            rows.forEach(row => {
+                const img = row.querySelector('.activities__media img');
+                if (img) {
+                    if (img.complete) return;          // already loaded
+                    img.addEventListener('load', runAll, {once: true});
+                }
+            });
+        })();
+    </script>
+
+
+    <script>
+        /**
+         * Lightweight image modal for carousel images.
+         * - Opens when clicking an image inside .mediaCarousel of a row
+         * - Keyboard: Esc (close), ←/→ (nav), Tab trap within controls
+         * - Restores focus to the opener, body scroll locked while open
+         */
+        (() => {
+            const modal = document.querySelector('.js-media-modal');
+            if (!modal) return;
+
+            const imgEl = modal.querySelector('.mediaModal__img');
+            const btnPrev = modal.querySelector('.mediaModal__prev');
+            const btnNext = modal.querySelector('.mediaModal__next');
+            const btnClose = modal.querySelector('.mediaModal__close');
+
+            let gallery = [];
+            let index = 0;
+            let lastFocused = null;
+
+            function collectImagesFromRow(row) {
+                const set = new Set();
+                const list = [];
+                row.querySelectorAll('.activities__carousel .mediaCarousel__slide img').forEach(img => {
+                    const src = img.getAttribute('src');
+                    if (src && !set.has(src)) {
+                        set.add(src);
+                        list.push({src, alt: img.getAttribute('alt') || ''});
+                    }
+                });
+                return list;
+            }
+
+            function render() {
+                const item = gallery[index];
+                if (!item) return;
+                imgEl.src = item.src;
+                imgEl.alt = item.alt;
+            }
+
+            function openWith(list, startIdx, trigger) {
+                gallery = list.slice();
+                index = Math.max(0, Math.min(startIdx || 0, gallery.length - 1));
+                lastFocused = document.activeElement;
+
+                render();
+                modal.hidden = false;
+                modal.classList.add('is-open');
+                document.body.style.overflow = 'hidden';
+                // initial focus
+                btnClose.focus();
+                // Click outside image closes
+                modal.addEventListener('click', backdropClose, {once: true, capture: true});
+                document.addEventListener('keydown', onKey);
+            }
+
+            function close() {
+                modal.classList.remove('is-open');
+                modal.hidden = true;
+                document.body.style.overflow = '';
+                document.removeEventListener('keydown', onKey);
+                if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+            }
+
+            function next() {
+                index = (index + 1) % gallery.length;
+                render();
+            }
+
+            function prev() {
+                index = (index - 1 + gallery.length) % gallery.length;
+                render();
+            }
+
+            function onKey(e) {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    close();
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    next();
+                } else if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    prev();
+                } else if (e.key === 'Tab') {
+                    const nodes = [btnPrev, btnNext, btnClose].filter(Boolean);
+                    const i = nodes.indexOf(document.activeElement);
+                    const dir = e.shiftKey ? -1 : 1;
+                    const ni = (i + dir + nodes.length) % nodes.length;
+                    e.preventDefault();
+                    nodes[ni].focus();
+                }
+            }
+
+            function backdropClose(e) {
+                const dialog = modal.querySelector('.mediaModal__dialog');
+                if (!dialog.contains(e.target)) close();
+            }
+
+            // Wire buttons
+            btnPrev.addEventListener('click', prev);
+            btnNext.addEventListener('click', next);
+            btnClose.addEventListener('click', close);
+
+            // Delegate: open on image click inside each row's carousel
+            document.querySelectorAll('.activities__row').forEach(row => {
+                const container = row.querySelector('.mediaCarousel');
+                if (!container) return;
+
+                container.addEventListener('click', (evt) => {
+                    const img = evt.target.closest('img');
+                    if (!img) return; // ignore clicks on videos/links
+                    const list = collectImagesFromRow(row);
+                    if (!list.length) return;
+
+                    const start = Math.max(0, list.findIndex(i => i.src === img.getAttribute('src')));
+                    openWith(list, start, img);
+                });
+            });
+        })();
+    </script>
+
+
+
 {% endblock %}
