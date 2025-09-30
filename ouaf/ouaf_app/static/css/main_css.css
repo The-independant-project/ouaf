@@ -567,9 +567,10 @@ body.no-scroll {
 
 /* Index */
 .index__section {
-  max-width: var(--max-w);
+  max-width: 90%;
   margin-inline: auto;
   text-align: center;
+  align-items: center;
 }
 
 .index__section__main_logo {
