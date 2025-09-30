@@ -1298,7 +1298,9 @@ body.no-scroll {
 .mediaModal__btn:focus{ background: rgba(255,255,255,.2); outline: none; }
 
 .mediaModal__close{
-  position: absolute; top: -56px; right: -4px;
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 @media (max-width: 680px){
   .mediaModal__dialog{

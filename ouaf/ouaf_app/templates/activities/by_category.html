@@ -349,7 +349,6 @@
 
             let gallery = [];
             let index = 0;
-            let opener = null;
             let lastFocused = null;
 
             function collectImagesFromRow(row) {
@@ -370,16 +369,11 @@
                 if (!item) return;
                 imgEl.src = item.src;
                 imgEl.alt = item.alt;
-                const next = new Image();
-                next.src = gallery[(index + 1) % gallery.length]?.src || '';
-                const prev = new Image();
-                prev.src = gallery[(index - 1 + gallery.length) % gallery.length]?.src || '';
             }
 
             function openWith(list, startIdx, trigger) {
                 gallery = list.slice();
                 index = Math.max(0, Math.min(startIdx || 0, gallery.length - 1));
-                opener = trigger || null;
                 lastFocused = document.activeElement;
 
                 render();
