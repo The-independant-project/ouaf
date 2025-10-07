@@ -99,61 +99,155 @@ logger = logging.getLogger(__name__)
 
 class ContactView(FormView):
     """
-    Handle the contact form workflow: validate input, apply anti-abuse protections,
-    and send emails to both the organization and the user.
+    Handle the contact form workflow with anti-abuse protections and three modes
+    (standard contact, volunteer application, membership/adhesion).
+
+    Overview:
+        This view validates user input, applies per-IP rate limiting,
+        renders email content from templates, sends an email to the organization,
+        and sends an acknowledgment (ACK) to the user. It also adapts UI copy,
+        email subjects, and success messaging based on the requested mode.
+
+    Modes & Routing:
+        - Mode selection is driven by the `type` query parameter:
+            * "contact" (default)
+            * "volunteer" | "benevole" | "bénévole"
+            * "adhesion" | "adhésion" | "membership" | "join" | "adherer" | "adhérer"
+        - The success redirect preserves the current `type` query parameter.
+
+    UI & Context:
+        - `MODE_CONFIG` centralizes per-mode copy:
+            * title, intro, textarea placeholder
+            * subject builder, ACK subject, success message
+        - Template context includes:
+            * `mode` (str): "contact" | "volunteer" | "adhesion"
+            * `is_volunteer` (bool)
+            * `is_membership` (bool)
+            * `contact_title` (str)
+            * `contact_intro` (str)
 
     Workflow:
-        1. Apply per-IP rate limiting to prevent abuse (default: 5 submissions per 15 min).
+        1. Apply per-IP rate limiting (default: 5 submissions / 15 minutes via cache).
         2. Validate the form (first/last name, email, phone, message, spam fields).
-        3. Generate a unique request ID (UUID) for correlation and logging.
-        4. Send a formatted email with details to the organization inbox.
-        5. Send an acknowledgment (ACK) email to the user confirming receipt.
-        6. Provide success or error feedback through Django messages.
+        3. Generate a unique request ID (UUID) for logging and correlation.
+        4. Build context and render organization email (HTML + text fallback).
+        5. Send the organization email (hard-fail on error with user-friendly message).
+        6. Render and send the user ACK email (fail silently but log errors).
+        7. Display a mode-specific success message and redirect.
 
-    Features:
-        - Rate limiting based on client IP address (stored in cache).
-        - Sanitized subject lines to prevent header injection attacks.
-        - Dual format emails (plain text + HTML) for maximum compatibility.
-        - Separate templates for organization and acknowledgment messages.
-        - Robust error handling: logs failures and prevents UX disruption if
-          acknowledgment email delivery fails.
-        - Custom headers (e.g., X-Contact-Request-ID) for traceability.
+    Email & Security:
+        - Subjects are sanitized to prevent header injection and to enforce a max length.
+        - Extra header: "X-Contact-Request-ID" is added to both emails.
+        - Emails are sent with plain text and HTML alternatives.
 
     Templates:
-        - contact/contact.html: Form rendering.
-        - emails/contact_to_org.html: HTML email to organization.
-        - emails/contact_ack.html: HTML acknowledgment to user.
+        - "contact/contact.html"            : form rendering.
+        - "emails/contact_to_org.html"      : HTML email to the organization.
+        - "emails/contact_ack.html"         : HTML acknowledgment to the user.
 
-    Success URL:
-        Redirects back to the "contact" page after successful submission.
+    Settings:
+        - CONTACT_RECIPIENTS (list[str])    : organization recipients (required).
+        - DEFAULT_FROM_EMAIL (str)          : sender address.
+        - EMAIL_SUBJECT_PREFIX (str, opt.)  : prefix added to outgoing subjects.
+
+    Rate limiting:
+        - Window length: RATE_LIMIT_WINDOW (seconds).
+        - Max submissions: RATE_LIMIT_MAX per IP within the window.
+        - Uses `cache.add`/`cache.incr` guarded by fallback `cache.set`.
 
     Attributes:
         template_name (str): Path to the contact form template.
         form_class (ContactForm): Form used for validation and cleaned data.
-        RATE_LIMIT_MAX (int): Maximum number of allowed submissions per IP.
-        RATE_LIMIT_WINDOW (int): Rate limit window duration (seconds).
+        RATE_LIMIT_MAX (int): Max submissions per IP per window.
+        RATE_LIMIT_WINDOW (int): Window size in seconds.
+        MODE_CONFIG (dict): Per-mode UI copy and behavior.
 
     Methods:
+        get_context_data(**kwargs):
+            Inject per-mode UI strings and flags into the template context.
         get_success_url():
-            Return redirect URL after success.
-        _client_ip():
-            Extract the client IP address from request headers.
+            Preserve current `type` query parameter on redirect.
+        _mode() -> str:
+            Resolve the current mode from the `type` query parameter.
+        get_form(form_class=None):
+            Apply per-mode placeholder to the message field.
+        _client_ip() -> str:
+            Extract the client IP from X-Forwarded-For or REMOTE_ADDR.
         dispatch(request, *args, **kwargs):
-            Apply rate limiting before dispatching the request.
+            Enforce rate limiting before processing POST submissions.
         form_valid(form):
-            Process valid form submission, handle email sending, logging,
-            and user feedback.
-        _safe_subject(text, max_len=140):
-            Sanitize and truncate subject lines for safe usage in SMTP headers.
+            Render and send organization + ACK emails, manage logging and messages.
+        _safe_subject(text: str, max_len: int = 140) -> str:
+            Sanitize and truncate subject lines for safe SMTP headers.
     """
     template_name = "contact/contact.html"
     form_class = ContactForm
 
-    RATE_LIMIT_MAX = 5  # 5 submit
-    RATE_LIMIT_WINDOW = 15 * 60  # 15 minutes
+    RATE_LIMIT_MAX = 5
+    RATE_LIMIT_WINDOW = 15 * 60
+
+    MODE_CONFIG = {
+        "contact": {
+            "title": "Contactez l’association",
+            "intro": "Remplissez le formulaire ci-dessous, nous reviendrons vers vous rapidement.",
+            "placeholder": "Expliquez-nous votre demande…",
+            "subject": lambda d: f"[Contact] {d['first_name']} {d['last_name']}",
+            "ack": "Nous avons bien reçu votre message",
+            "success": "Merci ! Votre message a bien été envoyé. Nous vous répondrons au plus vite.",
+        },
+        "volunteer": {
+            "title": "Devenir bénévole",
+            "intro": "Envoyez-nous votre candidature : motivations, disponibilités et centres d’intérêt.",
+            "placeholder": ("Présentez-vous et expliquez vos motivations, "
+                            "vos disponibilités et le type de missions qui vous intéressent."),
+            "subject": lambda d: "Candidature bénévolat",
+            "ack": "Nous avons bien reçu votre candidature",
+            "success": "Merci ! Votre candidature a bien été envoyée. Nous vous répondrons au plus vite.",
+        },
+        "adhesion": {
+            "title": "Adhérer à l’association",
+            "intro": "Envoyez votre candidature d’adhésion. Nous reviendrons vers vous pour la suite.",
+            "placeholder": ("Présentez-vous et expliquez vos motivations à adhérer, "
+                            "votre intérêt pour l’association et vos éventuelles disponibilités."),
+            "subject": lambda d: "Candidature adhésion",
+            "ack": "Nous avons bien reçu votre candidature d’adhésion",
+            "success": "Merci ! Votre candidature d’adhésion a bien été envoyée. Nous vous répondrons au plus vite.",
+        },
+    }
+
+    def _mode(self) -> str:
+        raw = (self.request.GET.get("type") or "").lower()
+        if raw in {"volunteer", "benevole", "bénévole"}:
+            return "volunteer"
+        if raw in {"adhesion", "adhésion", "membership", "join", "adherer", "adhérer"}:
+            return "adhesion"
+        return "contact"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        cfg = self.MODE_CONFIG[self._mode()]
+        ctx.update({
+            "contact_title": cfg["title"],
+            "contact_intro": cfg["intro"],
+            "is_volunteer": self._mode() == "volunteer",
+            "is_membership": self._mode() == "adhesion",
+            "mode": self._mode(),
+        })
+        return ctx
 
     def get_success_url(self):
-        return reverse_lazy("contact")
+        base = reverse_lazy("contact")
+        mode = self.request.GET.get("type")
+        return f"{base}?type={mode}" if mode else base
+
+    def _is_volunteer_mode(self) -> bool:
+        return (self.request.GET.get("type") or "").lower() in {"volunteer", "benevole", "bénévole"}
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        cfg = self.MODE_CONFIG[self._mode()]
+        form.fields["message"].widget.attrs["placeholder"] = cfg["placeholder"]
+        return form
 
     def _client_ip(self) -> str:
         xff = self.request.META.get("HTTP_X_FORWARDED_FOR")
@@ -185,10 +279,10 @@ class ContactView(FormView):
         data = form.cleaned_data
         req_id = str(uuid.uuid4())
 
-        subject = self._safe_subject(
-            f"{getattr(settings, 'EMAIL_SUBJECT_PREFIX', '')}[Contact] "
-            f"{data['first_name']} {data['last_name']}"
-        )
+        cfg = self.MODE_CONFIG[self._mode()]
+        subject_base = cfg["subject"](data)
+        subject = self._safe_subject(f"{getattr(settings, 'EMAIL_SUBJECT_PREFIX', '')}{subject_base}")
+
         ctx = {
             "first_name": data["first_name"],
             "last_name": data["last_name"],
@@ -196,12 +290,14 @@ class ContactView(FormView):
             "phone": data["phone"],
             "message": data["message"],
             "request_id": req_id,
+            "is_volunteer": self._mode() == "volunteer",
+            "is_membership": self._mode() == "adhesion",
+            "mode": self._mode(),
         }
         html = render_to_string("emails/contact_to_org.html", ctx)
         text = strip_tags(html)
 
         to_recipients = settings.CONTACT_RECIPIENTS
-
         org_msg = EmailMultiAlternatives(
             subject=subject,
             body=text,
@@ -213,17 +309,14 @@ class ContactView(FormView):
         org_msg.extra_headers = {"X-Contact-Request-ID": req_id}
 
         try:
-            sent = org_msg.send(fail_silently=False)
-            logger.info("Contact email sent",
-                        extra={"request_id": req_id, "to": to_recipients, "result": sent})
+            org_msg.send(fail_silently=False)
         except Exception:
             logger.exception("Contact email failed", extra={"request_id": req_id})
             messages.error(self.request, "Désolé, l’envoi a échoué. Merci de réessayer dans quelques minutes.")
             return self.form_invalid(form)
 
-        ack_subject = self._safe_subject("Nous avons bien reçu votre message")
-        ack_ctx = {"first_name": data["first_name"], "request_id": req_id}
-        ack_html = render_to_string("emails/contact_ack.html", ack_ctx)
+        ack_subject = self._safe_subject(cfg["ack"])
+        ack_html = render_to_string("emails/contact_ack.html", ctx)
         ack_text = strip_tags(ack_html)
 
         ack_msg = EmailMultiAlternatives(
@@ -234,13 +327,12 @@ class ContactView(FormView):
         )
         ack_msg.attach_alternative(ack_html, "text/html")
         ack_msg.extra_headers = {"X-Contact-Request-ID": req_id}
-
         try:
             ack_msg.send(fail_silently=True)
         except Exception:
             logger.exception("Contact ACK failed", extra={"request_id": req_id})
 
-        messages.success(self.request, "Merci ! Votre message a bien été envoyé. Nous vous répondrons au plus vite.")
+        messages.success(self.request, cfg["success"])
         return super().form_valid(form)
 
     @staticmethod
