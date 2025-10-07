@@ -6,8 +6,13 @@
 {% block content %}
     <section class="contact">
         <header class="contact__header" aria-labelledby="contact-title">
-            <h1 id="contact-title">Contactez l’association</h1>
-            <p class="contact__intro">Remplissez le formulaire ci-dessous, nous reviendrons vers vous rapidement.</p>
+            <h1 id="contact-title">
+                {{ contact_title|default:"Contactez l’association" }}
+            </h1>
+            <p class="contact__intro">
+                {{ contact_intro|default:"Remplissez le formulaire ci-dessous, nous reviendrons vers vous rapidement." }}
+            </p>
+
         </header>
 
         {% if messages %}

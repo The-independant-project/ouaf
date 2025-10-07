@@ -99,61 +99,102 @@ logger = logging.getLogger(__name__)
 
 class ContactView(FormView):
     """
-    Handle the contact form workflow: validate input, apply anti-abuse protections,
-    and send emails to both the organization and the user.
+    Handle the contact form workflow with anti-abuse protections and dual modes
+    (standard contact vs. volunteer application).
 
     Workflow:
-        1. Apply per-IP rate limiting to prevent abuse (default: 5 submissions per 15 min).
+        1. Apply per-IP rate limiting (default: 5 submissions per 15 minutes).
         2. Validate the form (first/last name, email, phone, message, spam fields).
         3. Generate a unique request ID (UUID) for correlation and logging.
-        4. Send a formatted email with details to the organization inbox.
-        5. Send an acknowledgment (ACK) email to the user confirming receipt.
-        6. Provide success or error feedback through Django messages.
+        4. Render and send an email to the organization inbox.
+        5. Render and send an acknowledgment (ACK) email to the user.
+        6. Provide success/error feedback via Django messages.
+
+    Modes:
+        - Standard contact (default): regular contact message flow.
+        - Volunteer mode: triggered when `?type=volunteer|benevole|bénévole` is present.
+          In this mode:
+            * Page title and intro text are adjusted.
+            * The message placeholder is tailored to a volunteer application.
+            * Subjects and user-facing messages reference a "candidature".
 
     Features:
-        - Rate limiting based on client IP address (stored in cache).
-        - Sanitized subject lines to prevent header injection attacks.
-        - Dual format emails (plain text + HTML) for maximum compatibility.
-        - Separate templates for organization and acknowledgment messages.
-        - Robust error handling: logs failures and prevents UX disruption if
-          acknowledgment email delivery fails.
+        - Per-IP rate limiting using cache to mitigate abuse.
+        - Subject sanitization to prevent header injection and enforce a maximum length.
+        - Plain text + HTML email alternatives for better client compatibility.
         - Custom headers (e.g., X-Contact-Request-ID) for traceability.
+        - Robust handling: org email failures abort the flow with user-friendly feedback,
+          while ACK failures are logged but do not disrupt UX.
 
     Templates:
-        - contact/contact.html: Form rendering.
-        - emails/contact_to_org.html: HTML email to organization.
-        - emails/contact_ack.html: HTML acknowledgment to user.
+        - contact/contact.html: Form rendering (context includes `is_volunteer`, `contact_title`, `contact_intro`).
+        - emails/contact_to_org.html: HTML email sent to the organization.
+        - emails/contact_ack.html: HTML acknowledgment sent to the user.
 
     Success URL:
-        Redirects back to the "contact" page after successful submission.
+        - Redirects back to the "contact" page and preserves the current `type` query param.
+
+    Settings:
+        - CONTACT_RECIPIENTS (list[str]): Organization recipients (required).
+        - DEFAULT_FROM_EMAIL (str): Sender address for outgoing emails.
+        - EMAIL_SUBJECT_PREFIX (str, optional): Prefix added to outgoing subjects.
 
     Attributes:
         template_name (str): Path to the contact form template.
         form_class (ContactForm): Form used for validation and cleaned data.
-        RATE_LIMIT_MAX (int): Maximum number of allowed submissions per IP.
-        RATE_LIMIT_WINDOW (int): Rate limit window duration (seconds).
+        RATE_LIMIT_MAX (int): Max submissions allowed per IP within the window.
+        RATE_LIMIT_WINDOW (int): Duration (in seconds) of the rate limiting window.
 
     Methods:
+        get_context_data(**kwargs):
+            Add volunteer-mode flags and UI strings to the template context when applicable.
         get_success_url():
-            Return redirect URL after success.
-        _client_ip():
-            Extract the client IP address from request headers.
+            Return the redirect URL after success, preserving the current `type` query parameter.
+        _is_volunteer_mode() -> bool:
+            Detect whether the current request is in volunteer mode based on the `type` query parameter.
+        get_form(form_class=None):
+            Customize the message placeholder in volunteer mode.
+        _client_ip() -> str:
+            Extract the client IP address from headers (X-Forwarded-For fallback to REMOTE_ADDR).
         dispatch(request, *args, **kwargs):
-            Apply rate limiting before dispatching the request.
+            Enforce per-IP rate limiting before processing POSTs.
         form_valid(form):
-            Process valid form submission, handle email sending, logging,
-            and user feedback.
-        _safe_subject(text, max_len=140):
-            Sanitize and truncate subject lines for safe usage in SMTP headers.
+            Build context, render templates, send organization and ACK emails, handle logging and UX messages.
+        _safe_subject(text: str, max_len: int = 140) -> str:
+            Sanitize and truncate subject lines for safe SMTP headers.
     """
     template_name = "contact/contact.html"
     form_class = ContactForm
 
-    RATE_LIMIT_MAX = 5  # 5 submit
-    RATE_LIMIT_WINDOW = 15 * 60  # 15 minutes
+    RATE_LIMIT_MAX = 5
+    RATE_LIMIT_WINDOW = 15 * 60
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        if self._is_volunteer_mode():
+            ctx["is_volunteer"] = True
+            ctx["contact_title"] = "Devenir bénévole"
+            ctx["contact_intro"] = (
+                "Envoyez-nous votre candidature : motivations, disponibilités et centres d’intérêt."
+            )
+        return ctx
 
     def get_success_url(self):
-        return reverse_lazy("contact")
+        base = reverse_lazy("contact")
+        mode = self.request.GET.get("type")
+        return f"{base}?type={mode}" if mode else base
+
+    def _is_volunteer_mode(self) -> bool:
+        return (self.request.GET.get("type") or "").lower() in {"volunteer", "benevole", "bénévole"}
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        if self._is_volunteer_mode():
+            form.fields["message"].widget.attrs["placeholder"] = (
+                "Présentez-vous et expliquez vos motivations, "
+                "vos disponibilités et le type de missions qui vous intéressent."
+            )
+        return form
 
     def _client_ip(self) -> str:
         xff = self.request.META.get("HTTP_X_FORWARDED_FOR")
@@ -185,10 +226,13 @@ class ContactView(FormView):
         data = form.cleaned_data
         req_id = str(uuid.uuid4())
 
-        subject = self._safe_subject(
-            f"{getattr(settings, 'EMAIL_SUBJECT_PREFIX', '')}[Contact] "
-            f"{data['first_name']} {data['last_name']}"
-        )
+        if self._is_volunteer_mode():
+            subject_base = "Candidature bénévolat"
+        else:
+            subject_base = f"[Contact] {data['first_name']} {data['last_name']}"
+
+        subject = self._safe_subject(f"{getattr(settings, 'EMAIL_SUBJECT_PREFIX', '')}{subject_base}")
+
         ctx = {
             "first_name": data["first_name"],
             "last_name": data["last_name"],
@@ -196,6 +240,7 @@ class ContactView(FormView):
             "phone": data["phone"],
             "message": data["message"],
             "request_id": req_id,
+            "is_volunteer": self._is_volunteer_mode(),
         }
         html = render_to_string("emails/contact_to_org.html", ctx)
         text = strip_tags(html)
@@ -213,16 +258,17 @@ class ContactView(FormView):
         org_msg.extra_headers = {"X-Contact-Request-ID": req_id}
 
         try:
-            sent = org_msg.send(fail_silently=False)
-            logger.info("Contact email sent",
-                        extra={"request_id": req_id, "to": to_recipients, "result": sent})
+            org_msg.send(fail_silently=False)
         except Exception:
             logger.exception("Contact email failed", extra={"request_id": req_id})
             messages.error(self.request, "Désolé, l’envoi a échoué. Merci de réessayer dans quelques minutes.")
             return self.form_invalid(form)
 
-        ack_subject = self._safe_subject("Nous avons bien reçu votre message")
-        ack_ctx = {"first_name": data["first_name"], "request_id": req_id}
+        ack_subject = self._safe_subject(
+            "Nous avons bien reçu votre candidature" if self._is_volunteer_mode()
+            else "Nous avons bien reçu votre message"
+        )
+        ack_ctx = {"first_name": data["first_name"], "request_id": req_id, "is_volunteer": self._is_volunteer_mode()}
         ack_html = render_to_string("emails/contact_ack.html", ack_ctx)
         ack_text = strip_tags(ack_html)
 
@@ -234,13 +280,17 @@ class ContactView(FormView):
         )
         ack_msg.attach_alternative(ack_html, "text/html")
         ack_msg.extra_headers = {"X-Contact-Request-ID": req_id}
-
         try:
             ack_msg.send(fail_silently=True)
         except Exception:
             logger.exception("Contact ACK failed", extra={"request_id": req_id})
 
-        messages.success(self.request, "Merci ! Votre message a bien été envoyé. Nous vous répondrons au plus vite.")
+        messages.success(
+            self.request,
+            "Merci ! Votre candidature a bien été envoyée. Nous vous répondrons au plus vite."
+            if self._is_volunteer_mode()
+            else "Merci ! Votre message a bien été envoyé. Nous vous répondrons au plus vite."
+        )
         return super().form_valid(form)
 
     @staticmethod
