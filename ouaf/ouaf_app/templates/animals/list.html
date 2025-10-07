@@ -4,53 +4,35 @@
 {% block subtitle %} - Animaux{% endblock %}
 
 {% block content %}
-<section class="team" aria-labelledby="team-title">
-  <header class="team__header">
-    <h1 id="team-title">Animaux</h1>
-  </header>
+    <section class="animals" aria-labelledby="animals-title">
+        <header class="animals__header">
+            <h1 id="animals-title">Animaux</h1>
+        </header>
 
-  <ul class="team__list" role="list">
-    {% for animal in animals %}
-      <li class="team__card">
-        <article class="team__person" aria-labelledby="team-name-{{ forloop.counter }}">
-          <figure class="team__figure">
-            <a href="{% url 'animal_detail' animal.id %}" style="text-decoration-line: none">
-                <div class="team__photoWrap">
-                    {% if animal.presentation_image %}
-                    <img
-                      class="team__photo"
-                      src="{{ animal.presentation_image.url }}"
-                      alt="Photo de l'animal appelé {{ animal.name }}"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    {% else %}
-                    <img
-                      class="team__photo"
-                      src="{% static 'images/avatar_placeholder.svg' %}"
-                      alt="Photo de l'animal appelé {{ animal.name }}"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    {% endif %}
-                </div>
-                <figcaption class="team__caption">
-                  <h3 class="team__name" id="team-name-{{ forloop.counter }}">
-                   <strong>{{ animal.name }}</strong>
-                  </h3>
-                  {% if animal.description %}
-                    <p class="team__bio">
-                      {{ animal.description }}
-                    </p>
-                  {% endif %}
-                </figcaption>
-            </a>
-          </figure>
-        </article>
-      </li>
-    {% empty %}
-      <li class="team__empty">Aucun animal pour le moment.</li>
-    {% endfor %}
-  </ul>
-</section>
+        <ul class="animals__list" role="list">
+            {% for animal in animals %}
+                <li class="animals__card">
+                    <a class="animals__cardLink" href="{% url 'animal_detail' animal.id %}">
+                        <figure class="animals__figure" aria-labelledby="animal-name-{{ forloop.counter }}">
+                            <div class="animals__photoWrap">
+                                {% if animal.presentation_image %}
+                                    <img class="animals__photo" src="{{ animal.presentation_image.url }}"
+                                         alt="Photo de {{ animal.name }}" loading="lazy" decoding="async"/>
+                                {% else %}
+                                    <img class="animals__photo" src="{% static 'images/avatar_placeholder.svg' %}"
+                                         alt="Photo de {{ animal.name }}" loading="lazy" decoding="async"/>
+                                {% endif %}
+                            </div>
+                            <figcaption class="animals__caption">
+                                <h3 class="animals__name" id="animal-name-{{ forloop.counter }}">{{ animal.name }}</h3>
+                            </figcaption>
+                        </figure>
+
+                    </a>
+                </li>
+            {% empty %}
+                <li class="animals__empty">Aucun animal pour le moment.</li>
+            {% endfor %}
+        </ul>
+    </section>
 {% endblock %}
