@@ -169,14 +169,53 @@ class ContactView(FormView):
     RATE_LIMIT_MAX = 5
     RATE_LIMIT_WINDOW = 15 * 60
 
+    MODE_CONFIG = {
+        "contact": {
+            "title": "Contactez l’association",
+            "intro": "Remplissez le formulaire ci-dessous, nous reviendrons vers vous rapidement.",
+            "placeholder": "Expliquez-nous votre demande…",
+            "subject": lambda d: f"[Contact] {d['first_name']} {d['last_name']}",
+            "ack": "Nous avons bien reçu votre message",
+            "success": "Merci ! Votre message a bien été envoyé. Nous vous répondrons au plus vite.",
+        },
+        "volunteer": {
+            "title": "Devenir bénévole",
+            "intro": "Envoyez-nous votre candidature : motivations, disponibilités et centres d’intérêt.",
+            "placeholder": ("Présentez-vous et expliquez vos motivations, "
+                            "vos disponibilités et le type de missions qui vous intéressent."),
+            "subject": lambda d: "Candidature bénévolat",
+            "ack": "Nous avons bien reçu votre candidature",
+            "success": "Merci ! Votre candidature a bien été envoyée. Nous vous répondrons au plus vite.",
+        },
+        "adhesion": {
+            "title": "Adhérer à l’association",
+            "intro": "Envoyez votre candidature d’adhésion. Nous reviendrons vers vous pour la suite.",
+            "placeholder": ("Présentez-vous et expliquez vos motivations à adhérer, "
+                            "votre intérêt pour l’association et vos éventuelles disponibilités."),
+            "subject": lambda d: "Candidature adhésion",
+            "ack": "Nous avons bien reçu votre candidature d’adhésion",
+            "success": "Merci ! Votre candidature d’adhésion a bien été envoyée. Nous vous répondrons au plus vite.",
+        },
+    }
+
+    def _mode(self) -> str:
+        raw = (self.request.GET.get("type") or "").lower()
+        if raw in {"volunteer", "benevole", "bénévole"}:
+            return "volunteer"
+        if raw in {"adhesion", "adhésion", "membership", "join", "adherer", "adhérer"}:
+            return "adhesion"
+        return "contact"
+
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        if self._is_volunteer_mode():
-            ctx["is_volunteer"] = True
-            ctx["contact_title"] = "Devenir bénévole"
-            ctx["contact_intro"] = (
-                "Envoyez-nous votre candidature : motivations, disponibilités et centres d’intérêt."
-            )
+        cfg = self.MODE_CONFIG[self._mode()]
+        ctx.update({
+            "contact_title": cfg["title"],
+            "contact_intro": cfg["intro"],
+            "is_volunteer": self._mode() == "volunteer",
+            "is_membership": self._mode() == "adhesion",
+            "mode": self._mode(),
+        })
         return ctx
 
     def get_success_url(self):
@@ -189,11 +228,8 @@ class ContactView(FormView):
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
-        if self._is_volunteer_mode():
-            form.fields["message"].widget.attrs["placeholder"] = (
-                "Présentez-vous et expliquez vos motivations, "
-                "vos disponibilités et le type de missions qui vous intéressent."
-            )
+        cfg = self.MODE_CONFIG[self._mode()]
+        form.fields["message"].widget.attrs["placeholder"] = cfg["placeholder"]
         return form
 
     def _client_ip(self) -> str:
@@ -226,11 +262,8 @@ class ContactView(FormView):
         data = form.cleaned_data
         req_id = str(uuid.uuid4())
 
-        if self._is_volunteer_mode():
-            subject_base = "Candidature bénévolat"
-        else:
-            subject_base = f"[Contact] {data['first_name']} {data['last_name']}"
-
+        cfg = self.MODE_CONFIG[self._mode()]
+        subject_base = cfg["subject"](data)
         subject = self._safe_subject(f"{getattr(settings, 'EMAIL_SUBJECT_PREFIX', '')}{subject_base}")
 
         ctx = {
@@ -240,13 +273,14 @@ class ContactView(FormView):
             "phone": data["phone"],
             "message": data["message"],
             "request_id": req_id,
-            "is_volunteer": self._is_volunteer_mode(),
+            "is_volunteer": self._mode() == "volunteer",
+            "is_membership": self._mode() == "adhesion",
+            "mode": self._mode(),
         }
         html = render_to_string("emails/contact_to_org.html", ctx)
         text = strip_tags(html)
 
         to_recipients = settings.CONTACT_RECIPIENTS
-
         org_msg = EmailMultiAlternatives(
             subject=subject,
             body=text,
@@ -264,12 +298,8 @@ class ContactView(FormView):
             messages.error(self.request, "Désolé, l’envoi a échoué. Merci de réessayer dans quelques minutes.")
             return self.form_invalid(form)
 
-        ack_subject = self._safe_subject(
-            "Nous avons bien reçu votre candidature" if self._is_volunteer_mode()
-            else "Nous avons bien reçu votre message"
-        )
-        ack_ctx = {"first_name": data["first_name"], "request_id": req_id, "is_volunteer": self._is_volunteer_mode()}
-        ack_html = render_to_string("emails/contact_ack.html", ack_ctx)
+        ack_subject = self._safe_subject(cfg["ack"])
+        ack_html = render_to_string("emails/contact_ack.html", ctx)
         ack_text = strip_tags(ack_html)
 
         ack_msg = EmailMultiAlternatives(
@@ -285,12 +315,7 @@ class ContactView(FormView):
         except Exception:
             logger.exception("Contact ACK failed", extra={"request_id": req_id})
 
-        messages.success(
-            self.request,
-            "Merci ! Votre candidature a bien été envoyée. Nous vous répondrons au plus vite."
-            if self._is_volunteer_mode()
-            else "Merci ! Votre message a bien été envoyé. Nous vous répondrons au plus vite."
-        )
+        messages.success(self.request, cfg["success"])
         return super().form_valid(form)
 
     @staticmethod
