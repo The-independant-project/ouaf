@@ -99,67 +99,84 @@ logger = logging.getLogger(__name__)
 
 class ContactView(FormView):
     """
-    Handle the contact form workflow with anti-abuse protections and dual modes
-    (standard contact vs. volunteer application).
+    Handle the contact form workflow with anti-abuse protections and three modes
+    (standard contact, volunteer application, membership/adhesion).
+
+    Overview:
+        This view validates user input, applies per-IP rate limiting,
+        renders email content from templates, sends an email to the organization,
+        and sends an acknowledgment (ACK) to the user. It also adapts UI copy,
+        email subjects, and success messaging based on the requested mode.
+
+    Modes & Routing:
+        - Mode selection is driven by the `type` query parameter:
+            * "contact" (default)
+            * "volunteer" | "benevole" | "bénévole"
+            * "adhesion" | "adhésion" | "membership" | "join" | "adherer" | "adhérer"
+        - The success redirect preserves the current `type` query parameter.
+
+    UI & Context:
+        - `MODE_CONFIG` centralizes per-mode copy:
+            * title, intro, textarea placeholder
+            * subject builder, ACK subject, success message
+        - Template context includes:
+            * `mode` (str): "contact" | "volunteer" | "adhesion"
+            * `is_volunteer` (bool)
+            * `is_membership` (bool)
+            * `contact_title` (str)
+            * `contact_intro` (str)
 
     Workflow:
-        1. Apply per-IP rate limiting (default: 5 submissions per 15 minutes).
+        1. Apply per-IP rate limiting (default: 5 submissions / 15 minutes via cache).
         2. Validate the form (first/last name, email, phone, message, spam fields).
-        3. Generate a unique request ID (UUID) for correlation and logging.
-        4. Render and send an email to the organization inbox.
-        5. Render and send an acknowledgment (ACK) email to the user.
-        6. Provide success/error feedback via Django messages.
+        3. Generate a unique request ID (UUID) for logging and correlation.
+        4. Build context and render organization email (HTML + text fallback).
+        5. Send the organization email (hard-fail on error with user-friendly message).
+        6. Render and send the user ACK email (fail silently but log errors).
+        7. Display a mode-specific success message and redirect.
 
-    Modes:
-        - Standard contact (default): regular contact message flow.
-        - Volunteer mode: triggered when `?type=volunteer|benevole|bénévole` is present.
-          In this mode:
-            * Page title and intro text are adjusted.
-            * The message placeholder is tailored to a volunteer application.
-            * Subjects and user-facing messages reference a "candidature".
-
-    Features:
-        - Per-IP rate limiting using cache to mitigate abuse.
-        - Subject sanitization to prevent header injection and enforce a maximum length.
-        - Plain text + HTML email alternatives for better client compatibility.
-        - Custom headers (e.g., X-Contact-Request-ID) for traceability.
-        - Robust handling: org email failures abort the flow with user-friendly feedback,
-          while ACK failures are logged but do not disrupt UX.
+    Email & Security:
+        - Subjects are sanitized to prevent header injection and to enforce a max length.
+        - Extra header: "X-Contact-Request-ID" is added to both emails.
+        - Emails are sent with plain text and HTML alternatives.
 
     Templates:
-        - contact/contact.html: Form rendering (context includes `is_volunteer`, `contact_title`, `contact_intro`).
-        - emails/contact_to_org.html: HTML email sent to the organization.
-        - emails/contact_ack.html: HTML acknowledgment sent to the user.
-
-    Success URL:
-        - Redirects back to the "contact" page and preserves the current `type` query param.
+        - "contact/contact.html"            : form rendering.
+        - "emails/contact_to_org.html"      : HTML email to the organization.
+        - "emails/contact_ack.html"         : HTML acknowledgment to the user.
 
     Settings:
-        - CONTACT_RECIPIENTS (list[str]): Organization recipients (required).
-        - DEFAULT_FROM_EMAIL (str): Sender address for outgoing emails.
-        - EMAIL_SUBJECT_PREFIX (str, optional): Prefix added to outgoing subjects.
+        - CONTACT_RECIPIENTS (list[str])    : organization recipients (required).
+        - DEFAULT_FROM_EMAIL (str)          : sender address.
+        - EMAIL_SUBJECT_PREFIX (str, opt.)  : prefix added to outgoing subjects.
+
+    Rate limiting:
+        - Window length: RATE_LIMIT_WINDOW (seconds).
+        - Max submissions: RATE_LIMIT_MAX per IP within the window.
+        - Uses `cache.add`/`cache.incr` guarded by fallback `cache.set`.
 
     Attributes:
         template_name (str): Path to the contact form template.
         form_class (ContactForm): Form used for validation and cleaned data.
-        RATE_LIMIT_MAX (int): Max submissions allowed per IP within the window.
-        RATE_LIMIT_WINDOW (int): Duration (in seconds) of the rate limiting window.
+        RATE_LIMIT_MAX (int): Max submissions per IP per window.
+        RATE_LIMIT_WINDOW (int): Window size in seconds.
+        MODE_CONFIG (dict): Per-mode UI copy and behavior.
 
     Methods:
         get_context_data(**kwargs):
-            Add volunteer-mode flags and UI strings to the template context when applicable.
+            Inject per-mode UI strings and flags into the template context.
         get_success_url():
-            Return the redirect URL after success, preserving the current `type` query parameter.
-        _is_volunteer_mode() -> bool:
-            Detect whether the current request is in volunteer mode based on the `type` query parameter.
+            Preserve current `type` query parameter on redirect.
+        _mode() -> str:
+            Resolve the current mode from the `type` query parameter.
         get_form(form_class=None):
-            Customize the message placeholder in volunteer mode.
+            Apply per-mode placeholder to the message field.
         _client_ip() -> str:
-            Extract the client IP address from headers (X-Forwarded-For fallback to REMOTE_ADDR).
+            Extract the client IP from X-Forwarded-For or REMOTE_ADDR.
         dispatch(request, *args, **kwargs):
-            Enforce per-IP rate limiting before processing POSTs.
+            Enforce rate limiting before processing POST submissions.
         form_valid(form):
-            Build context, render templates, send organization and ACK emails, handle logging and UX messages.
+            Render and send organization + ACK emails, manage logging and messages.
         _safe_subject(text: str, max_len: int = 140) -> str:
             Sanitize and truncate subject lines for safe SMTP headers.
     """
