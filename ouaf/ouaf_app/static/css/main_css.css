@@ -1544,6 +1544,7 @@ body.no-scroll {
     transform: scale(1.05);
 }
 
+
 /* Lightbox Styles */
 .lightbox-container {
     position: fixed;
@@ -1570,6 +1571,121 @@ body.no-scroll {
     cursor: pointer;
 }
 
+
+
+
+/* ============ ANIMALS – full image, spaced, caption below ============ */
+
+
+.animals{
+  --card-min: 220px;
+  --card-max: 340px;
+
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding: clamp(12px, 2.5vw, 24px);
+  box-sizing: border-box;
+}
+
+.animals__header{
+  text-align:center;
+  margin-bottom: clamp(12px, 2.5vw, 24px);
+}
+.animals__header h1{
+  font-size: clamp(1.6rem, 2.2vw, 2rem);
+  font-weight: 700;
+  color: var(--clr-ink);
+  margin: 0;
+}
+
+
+.animals__list{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10vw;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.animals__card{
+  flex: 1 1 var(--card-min);
+  max-width: var(--card-max);
+}
+.animals__cardLink{
+  display:block;
+  height:100%;
+  color: inherit;
+  text-decoration: none;
+}
+.animals__figure{ margin: 0; display:flex; flex-direction:column; gap: .35rem; }
+
+
+.animals__photoWrap{
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border: 2px solid var(--clr-primary);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0,0,0,.08);
+  background: transparent;
+}
+.animals__photo{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit: cover;
+  transform: scale(1);
+  transition: transform .18s ease;
+}
+.animals__cardLink:hover .animals__photo,
+.animals__cardLink:focus .animals__photo{ transform: scale(1.02); }
+
+
+.animals__caption{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+}
+.animals__name{
+
+  font-family: var(--font-hand, "Patrick Hand", "Quicksand", var(--font-ui));
+  font-weight: 700;
+  letter-spacing: .2px;
+  margin: .1rem 0 0;
+  color: var(--clr-ink);
+  font-size: clamp(1rem, .6vw + .95rem, 1.2rem);
+}
+
+
+.animals__empty{
+  flex: 1 1 100%;
+  text-align:center;
+  color: var(--clr-muted);
+  font-style: italic;
+  padding: 1.25rem 0;
+}
+
+/* ===== responsive ===== */
+@media (max-width: 1024px){
+  .animals{ padding: 16px; }
+  .animals__list{ gap: clamp(16px, 3vw, 28px); }
+  .animals__card{ --card-max: 300px; }
+}
+@media (max-width: 640px){
+  .animals{ padding: 14px; }
+  .animals__list{ gap: 16px; }
+  .animals__card{
+    flex: 1 1 92%;
+    max-width: 420px;
+    margin-inline: auto;
+  }
+}
 
 
 
